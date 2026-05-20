@@ -3,7 +3,7 @@ import { ShopProvider } from './context/ShopContext';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import Foot from './components/Foot';
-
+import LOGO from './assets/LOGO.png'
 // Authentication Icons
 import { Eye, EyeOff, Lock, Mail, Shield, User, LogOut } from 'lucide-react';
 
@@ -85,7 +85,7 @@ export default function App() {
           {/* Logo / Brand Header */}
           <div className="text-center mb-8">
             <img 
-              src="./assets/LOGO.png" 
+              src={LOGO}
               alt="PSP MART Logo" 
               className="w-16 h-16 rounded-2xl mx-auto mb-3 shadow-md object-cover"
             />
