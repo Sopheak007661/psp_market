@@ -85,7 +85,7 @@ export default function App() {
           {/* Logo / Brand Header */}
           <div className="text-center mb-8">
             <img 
-              src="https://img.sanishtech.com/u/d95b31313e8c668b3349dd86557f3288.jpg" 
+              src="./assets/LOGO.png" 
               alt="PSP MART Logo" 
               className="w-16 h-16 rounded-2xl mx-auto mb-3 shadow-md object-cover"
             />
