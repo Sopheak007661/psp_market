@@ -14,6 +14,10 @@ import Cart from './pages/ClientShop/Cart';
 import DashboardHome from './pages/AdminDashboard/DashboardHome';
 import ManageProducts from './pages/AdminDashboard/ManageProducts';
 import Orders from './pages/AdminDashboard/Orders';
+import Graphic from './pages/AdminDashboard/GraphicAnalytics';
+import Users from './pages/AdminDashboard/UserRegister';
+import Checkin from './pages/AdminDashboard/CheckInOut';
+import Evaloute from './pages/AdminDashboard/EvaluatePerformance';
 
 export default function App() {
   // ==========================================
@@ -298,10 +302,14 @@ export default function App() {
             {view === 'shop-home' && <Home setView={setView} setSelectedProductId={setSelectedProductId} />}
             {view === 'shop-home' && <div><Foot /></div>}
             {view === 'shop-detail' && <ProductDetail productId={selectedProductId} setView={setView} />}
-            {view === 'shop-cart' && <Cart />}
+            {view === 'shop-cart' && <Cart userEmail={email} userRole={userRole} />}
             {view === 'admin-home' && <DashboardHome />}
             {view === 'admin-products' && <ManageProducts />}
             {view === 'admin-orders' && <Orders />}
+            {view === 'admin-graphic' && <Graphic />}
+            {view === 'admin-users' && <Users />}
+            {view === 'admin-checkout' && <Checkin />}
+            {view === 'admin-evaluate' && <Evaloute />}
           </main>
         </div>
       </div>
