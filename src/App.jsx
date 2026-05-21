@@ -132,7 +132,7 @@ export default function App() {
               alt="PSP MART Logo" 
               className="w-16 h-16 rounded-2xl mx-auto mb-3 shadow-md object-cover"
             />
-            <h2 className="text-2xl font-bold text-blue-800 tracking-tight">Welcome to PSP MART</h2>
+            <h2 className="text-2xl font-bold text-blue-800 tracking-tight">Welcome to PSP MARKET</h2>
             <p className="text-sm text-slate-500 mt-1">Select your access portal below</p>
           </div>
 
@@ -146,7 +146,7 @@ export default function App() {
               }`}
             >
               <User size={16} />
-              User Portal
+              User
             </button>
             <button
               type="button"
@@ -156,7 +156,7 @@ export default function App() {
               }`}
             >
               <Shield size={16} />
-              Admin Portal
+              Admin
             </button>
           </div>
 

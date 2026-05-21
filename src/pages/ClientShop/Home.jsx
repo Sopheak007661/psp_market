@@ -63,8 +63,32 @@ export default function Home({ setView, setSelectedProductId }) {
     const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
   });
-    
+
+
+
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    let currentNumber = 0; // Tracks the next number to add (0, 1, 2... up to 50)
+
+    const intervalId = setInterval(() => {
+      if (currentNumber > 50) {
+        // If we finished adding 50, reset everything back to 0
+        setCount(0);
+        currentNumber = 0;
+      } else {
+        // Add the current number to the total count
+        setCount(prevCount => prevCount + currentNumber);
+        currentNumber++; // Move to the next number for the next tick
+      }
+    }, 500); // Runs every 500ms
+
+    // Clean up interval if the component unmounts
+    return () => clearInterval(intervalId);
+  }, []);
+
+
   return (
+    
     <div>
       {/* 4. The nav element pulls the active image string instantly from state */}
       <nav 
@@ -72,9 +96,29 @@ export default function Home({ setView, setSelectedProductId }) {
         style={{ backgroundImage: `url(${bgImages[currentBgIndex]})`,  }}
       >
         <div className="flex flex-col w-[100%] -mb-4 h-[100%]    mb-6 pb-5    p-10 justify-end  gap-20">
-          <div className='w-[100%] flex flex-col  gap-1 items-start'>
-            <h1 className="text-7xl font-black text-blue-800">market<br />online</h1>
-            <address className="text-black/85 text-xl mt-0.5 "><b className=''>Find your favourite product here....<br /> Buy now</b> </address>
+          <div className='flex justify-center'>
+            <div className='w-[100%] flex flex-col  gap-1 items-start'>
+                <h1 className="text-7xl font-black text-blue-800">market<br />online</h1>
+                <address className="text-black/85 text-xl mt-0.5 "><b className=''>Find your favourite product here....<br /> Buy now</b> </address>
+            </div>
+            <div className='w-[50%] h-[80%]  bg-gradient-to-bl from-black/50 to-white/90 absolute right-0 top-0 flex items-end pl-5 pb-10 pt-20 rounded-bl-full'>
+               <div className=' hidden md:flex md:flex-wrap gap-10  '>
+                  <div className='flex flex-col bg-blue-200 p-5 '>
+                    <h3 className='text-ms border-b border-blue-800 text-blue-800 text-xl'>User</h3>
+                    <h1 className='text-green-600 text-red-600'>
+                    +{count}
+                    </h1>
+                  </div>
+                  <div className='flex flex-col bg-blue-200 p-5 '>
+                    <h3 className='text-ms border-b border-blue-800 text-blue-800 text-xl'>Salling</h3>
+                    <h1 className='text-green-600 text-gray-700'>+1{count}</h1>
+                  </div>
+                  <div className='flex flex-col bg-blue-200 p-5 '>
+                    <h3 className='text-ms border-b border-blue-800 text-blue-800 text-xl'>Favourite</h3>
+                    <h1 className='text-green-600'>+23</h1>
+                  </div>
+            </div>
+            </div>
           </div>
           
           {/* Scrollable category list buttons */}
