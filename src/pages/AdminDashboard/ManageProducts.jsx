@@ -165,7 +165,7 @@ export default function ManageProducts() {
                     </div>
                   </td>
                   <td className="px-5 py-2"><span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md text-[10px] font-semibold whitespace-nowrap">{product.category}</span></td>
-                  <td className="px-5 py-2 font-semibold text-gray-900">${product.price.toFixed(2)}</td>
+                  <td className="px-5 py-2 font-semibold text-gray-900">${Number(product.price||0).toFixed(2)}</td>
                   <td className="px-5 py-2 text-right">
                     <button onClick={() => deleteProduct(product.id)} className="text-gray-400 hover:text-red-500 p-1 rounded-lg transition"><Trash2 className="h-4 w-4" /></button>
                   </td>

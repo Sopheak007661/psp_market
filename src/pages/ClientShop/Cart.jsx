@@ -153,7 +153,7 @@ ${itemDetails}
                 <img src={item.image} alt="" className="w-12 h-12 object-cover rounded-xl bg-gray-50 border border-gray-100" />
                 <div>
                   <h4 className="font-bold text-gray-900 line-clamp-1">{item.name}</h4>
-                  <p className="text-gray-400 text-[11px] font-semibold">${item.price.toFixed(2)}</p>
+                  <p className="text-gray-400 text-[11px] font-semibold">${Number(item.price||0).toFixed(2)}</p>
                 </div>
               </div>
               <div className="flex items-center space-x-4">
