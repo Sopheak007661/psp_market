@@ -19,7 +19,7 @@ export default function ProductCard({ product, setView, setSelectedProductId }) 
       <div className="p-4 flex-1 flex flex-col justify-between">
         <div className="cursor-pointer" onClick={handleCardClick}>
           <h3 className="font-bold text-gray-900 text-sm line-clamp-1 mb-1">{product.name}</h3>
-          <p className="text-base font-black text-gray-900">${product.price.toFixed(2)}</p>
+          <p className="text-base font-black text-gray-900">${Number(product.price||0).toFixed(2)}</p>
         </div>
         <button 
           onClick={() => addToCart(product)}

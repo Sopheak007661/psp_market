@@ -28,7 +28,7 @@ export default function ProductDetail({ productId, setView }) {
               <div>
                 <span className="text-[10px] uppercase tracking-widest font-extrabold text-white  bg-blue-500 px-3.5 py-0 shadow-md shadow-blue-800 rounded-md">{product.category}</span>
                 <h1 className="text-2xl font-black text-gray-900 mt-3">{product.name}</h1>
-                <p className="text-2xl font-black text-gray-900 mt-2">${product.price.toFixed(2)}</p>
+                <p className="text-2xl font-black text-gray-900 mt-2">${Number(product.price||0).toFixed(2)}</p>
                 
                 {/* 🔥 STREAMING DYNAMIC INPUT DESCRIPTION FROM CONTEXT STORE MEMORY */}
                 <p className="text-gray-600 text-md mt-4 leading-relaxed whitespace-pre-line text-left">
