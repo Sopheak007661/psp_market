@@ -4,7 +4,7 @@ import Appstore from '../assets/App_store.png'
 const Foot = () => {
   return (
     
-    <div className=' flex flex-col   border-t-1 border-gray-500 absolute buttom-0  right-0 left-0 justify-center items-center p-10 gap-10 min-h-[50vh]'>
+    <div className=' flex flex-col  bg-white  border-t-1 border-gray-500 absolute buttom-0  right-0 left-0 justify-center items-center p-10 gap-10 min-h-[50vh]'>
 
         <div className='flex flex-wrap  justify-around w-full  gap-10'>
             <div className='flex flex-col gap-8 items-start'>
@@ -64,7 +64,7 @@ const Foot = () => {
                 </div>
             </div>
         </div>
-        <div className='flex justify-between absolute -bottom-10 left-0 right-0 p-5 pl-10 pr-10 '>
+        <div className='flex align-center bg-white border-t border-gray-500 justify-between absolute -bottom-10 left-0 right-0 p-5 pl-10 pr-10 '>
             <div >
                 <div className='flex gap-5'>
                     <h3 className='hidden md:flex'>Powered by </h3>

@@ -43,6 +43,7 @@ export default function App() {
     e.preventDefault();
     setError('');
 
+    // 1. Basic Field Presence Check
     if (!email || !password) {
       setError('Please fill in all fields.');
       return;
@@ -58,7 +59,22 @@ export default function App() {
         setError('Access Denied: Only the primary administrator can log in here.');
       }
     } else {
-      // REGULAR CUSTOMER USER CONDITION (No rules, auto log-in)
+      // REGULAR CUSTOMER USER CONDITION WITH STRICT VALIDATION
+      
+      // Email Regex Validation Rule
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        setError('Please enter a valid email address (e.g., user@example.com).');
+        return;
+      }
+
+      // Password Length Validation Rule 
+      if (password.length < 6) {
+        setError('Password must be at least 6 characters long.');
+        return;
+      }
+
+      // If validation passes, log them in
       setIsLoggedIn(true);
       setUserRole('user');
       setView('shop-home'); // Auto redirect client to the storefront
@@ -79,8 +95,35 @@ export default function App() {
   // =========================================================
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4 py-12">
-        <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-100 font-sans">
+      <div className="relative min-h-screen flex items-center justify-center px-4 py-12 overflow-hidden bg-slate-900">
+        
+        {/* Injecting CSS Animation for the panning background directly */}
+        <style>{`
+          @keyframes slideBg {
+            0% { background-position: 0px 0px; }
+            100% { background-position: -1400px 0px; }
+          }
+          .moving-bg {
+            animation: slideBg 45s linear infinite;
+            background-size: cover;
+            background-repeat: repeat-x;
+          }
+        `}</style>
+
+        {/* Animated Background Overlay layer */}
+        <div 
+          className="absolute inset-0 moving-bg opacity-30 pointer-events-none"
+          style={{ 
+            // You can replace this URL placeholder with any high-resolution wallpaper link or shopping texture pattern!
+            backgroundImage: `url('https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=2070')` 
+          }}
+        />
+        
+        {/* Subtle Ambient Vignette Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-blue-800/50 via-transparent to-green-800/50 pointer-events-none" />
+
+        {/* Form Container Card - relative z-10 puts it over the background layer */}
+        <div className="relative z-10 bg-black/70 p-8 rounded-2xl shadow-2xl w-full max-w-md border border-white/20 font-sans backdrop-blur-sm">
           
           {/* Logo / Brand Header */}
           <div className="text-center mb-8">
@@ -89,17 +132,17 @@ export default function App() {
               alt="PSP MART Logo" 
               className="w-16 h-16 rounded-2xl mx-auto mb-3 shadow-md object-cover"
             />
-            <h2 className="text-2xl font-bold text-slate-800 tracking-tight">Welcome to PSP MART</h2>
+            <h2 className="text-2xl font-bold text-blue-800 tracking-tight">Welcome to PSP MART</h2>
             <p className="text-sm text-slate-500 mt-1">Select your access portal below</p>
           </div>
 
           {/* Segmented Control Panel Options */}
-          <div className="bg-slate-100 p-1 rounded-xl flex mb-6">
+          <div className="bg-white/50 p-1 rounded-xl flex mb-6">
             <button
               type="button"
               onClick={() => { setAuthPortal('user'); setError(''); }}
               className={`flex-1 py-2 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2 ${
-                authPortal === 'user' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                authPortal === 'user' ? 'bg-blue-600 text-gray-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <User size={16} />
@@ -109,7 +152,7 @@ export default function App() {
               type="button"
               onClick={() => { setAuthPortal('admin'); setError(''); setIsRegister(false); }}
               className={`flex-1 py-2 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2 ${
-                authPortal === 'admin' ? 'bg-white text-red-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                authPortal === 'admin' ? 'bg-red-600 text-gray-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <Shield size={16} />
@@ -126,7 +169,7 @@ export default function App() {
 
           <form onSubmit={handleAuthSubmit} className="space-y-4">
             {/* Input Field: Email */}
-            <div>
+            <div className='text-start'>
               <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Email Address</label>
               <div className="relative">
                 <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
@@ -143,7 +186,7 @@ export default function App() {
             </div>
             
             {/* Input Field: Password */}
-            <div>
+            <div className='text-start '>
               <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Password</label>
               <div className="relative">
                 <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
@@ -208,7 +251,7 @@ export default function App() {
   // ============================================================
   return (
     <ShopProvider>
-      <div className="min-h-screen bg-white text-gray-800 tracking-tight flex flex-col">
+      <div className="min-h-screen bg-white pt-10 text-gray-800 tracking-tight flex flex-col">
         
 
         {/* Render Customer Header Only on customer viewports */}
@@ -218,7 +261,7 @@ export default function App() {
             <Navbar setView={setView} userRole={userRole} handleLogout={handleLogout} />
             
             {/* Embedded Mini Session Toolbar for Logged In Customer profiles */}
-            <div className="absolute top-4 right-44 hidden md:flex items-center gap-2 bg-slate-50 border border-slate-200 py-1 px-3 rounded-lg text-xs">
+            <div className="absolute top-4 right-44 items-center gap-2 bg-slate-50 border border-slate-200 py-1 px-3 rounded-lg text-xs">
               <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
               <span className="text-slate-600 font-medium truncate max-w-[120px]">{email}</span>
               <button onClick={handleLogout} className="text-red-500 hover:text-red-700 font-semibold ml-1">
@@ -231,9 +274,9 @@ export default function App() {
         <div className="flex flex-1">
           {/* Render Control Board Navigation Panel with dynamic logout inside Admin Viewports */}
           {isAdminView && (
-            <div className="flex flex-col bg-gray-900 text-white min-h-screen">
+            <div className=" flex flex-col md:flex md:flex-col bg-white text-white min-h-screen">
               {/* Profile Bar directly inside Admin Side panel section area */}
-              <div className="p-4 border-b border-gray-800 flex items-center justify-between gap-2 bg-gray-950">
+              <div className="p-4 border-b border-gray-800 flex absolute top-0 left-0 right-0 items-center justify-between gap-2 bg-green-800">
                 <div className="flex items-center gap-2">
                   <Shield size={16} className="text-red-400" />
                   <span className="text-xs font-bold text-gray-300 truncate max-w-[100px]">{email}</span>

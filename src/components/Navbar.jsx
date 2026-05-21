@@ -19,7 +19,7 @@ export default function Navbar({ setView, userRole, handleLogout }) {
               </div>
 
               {/* 🔍 Search Input Bar */}
-              <div className="flex-1 max-w-md mx-4">
+              <div className="hidden max-w-md mx-4 md:flex md:flex-1">
                 <div className="relative w-full">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Search className="h-4 w-4 text-blue-400" />
@@ -47,7 +47,7 @@ export default function Navbar({ setView, userRole, handleLogout }) {
 
               {/* Navigation Actions */}
               <div className="flex items-center space-x-6 flex-shrink-0">
-                <button onClick={() => setView('shop-home')} className="text-green-600 hover:text-blue-600 font-medium transition">Market</button>
+                <button onClick={() => setView('shop-home')} className="hidden md:flex text-green-600 hover:text-blue-600 font-medium transition">Market</button>
                 
                 <button onClick={() => setView('shop-cart')} className="relative p-2 text-green-600 hover:text-blue-600 transition">
                   <ShoppingCart className="h-5 w-5" />

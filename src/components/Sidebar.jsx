@@ -71,11 +71,14 @@ export default function Sidebar({ setView, currentView }) {
   ];
 
   return (
-    <aside className="w-64 bg-blue-800 text-gray-300 min-h-screen p-6 flex flex-col justify-between border-r border-gray-800">
+    <aside className="w-[100px]  md:w-64 flex bg-blue-800 text-gray-300 min-h-screen p-6 flex flex-col justify-start pt-20 gap-40 border-r border-gray-800">
+      <div>
+
+      </div>
       <div>
         <div className="flex items-center space-x-2 text-green-600 mb-8 px-2">
           <ShieldAlert className="h-5 w-5 text-green-800" />
-          <span className="text-sm font-bold tracking-wider uppercase">PSP FUNCTION</span>
+          <span className="hidden md:flex text-sm font-bold tracking-wider uppercase">PSP FUNCTION</span>
         </div>
         <nav className="space-y-1.5">
           {navItems.map((item) => {
@@ -86,12 +89,12 @@ export default function Sidebar({ setView, currentView }) {
                 onClick={() => setView(item.id)} 
                 className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-xs font-semibold transition ${
                   currentView === item.id 
-                    ? 'bg-green-600 text-white' 
+                    ? 'bg-green-600 text-white ' 
                     : 'hover:bg-gray-800 text-gray-100 hover:text-gray-200'
                 }`}
               >
-                <Icon className="h-4 w-4" />
-                <span>{item.name}</span>
+                <Icon className="h-4 w-4 flex flex-col bg-green-900 flex" />
+                <span className='hidden md:flex'>{item.name}</span>
               </button>
             );
           })}
@@ -99,9 +102,9 @@ export default function Sidebar({ setView, currentView }) {
       </div>
       <button 
         onClick={() => setView('shop-home')} 
-        className="w-full flex items-center space-x-2 justify-center border border-gray-800 hover:border-gray-700 text-gray-300 px-4 py-2.5 rounded-xl text-xs font-semibold transition bg-gray-800/30"
+        className="w-full flex items-center space-x-2 justify-center border border-gray-800 hover:border-gray-700 text-gray-300 px-8 py-2.5 rounded-xl text-xs font-semibold transition bg-red-800 hover:bg-black/80 active:bg-red-800 "
       >
-        <ArrowLeft className="h-4 w-4" />
+        <ArrowLeft className="h-4 w-4 " />
         <span>Exit Console</span>
       </button>
     </aside>
