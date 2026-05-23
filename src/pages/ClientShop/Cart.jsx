@@ -3474,8 +3474,6 @@
 
 
 
-
-
 import React, { useState, useContext, useEffect, useRef } from 'react';
 import { ShopContext } from '../../context/ShopContext';
 import { 
@@ -3484,20 +3482,16 @@ import {
   Clock, DollarSign, ShieldCheck, User 
 } from 'lucide-react';
 
-// 🔁 Change this to your actual backend URL
-const BACKEND_URL = 'https://backend-psp-market.onrender.com';/////////////===============================================================
+const BACKEND_URL = 'https://backend-psp-market.onrender.com';
 
-// 🌟 ទទួលយក userEmail និង userRole ជា Props ពី App.jsx
 export default function Cart({ userEmail, userRole }) {
   const { cart, updateQuantity, removeFromCart, checkout, khqrImage } = useContext(ShopContext);
   const [showQrModal, setShowQrModal] = useState(false);
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
-
   const [invoiceDetails, setInvoiceDetails] = useState(null);
   const [orderHistory, setOrderHistory] = useState([]);
 
-  // Delivery Form States
   const [customerName, setCustomerName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [address, setAddress] = useState('');
@@ -3506,36 +3500,29 @@ export default function Cart({ userEmail, userRole }) {
   const [shippingFee, setShippingFee] = useState(1.00);
   const [formError, setFormError] = useState('');
 
-  // 🌟 Auto-payment detection states
   const [paymentSessionId, setPaymentSessionId] = useState(null);
   const pollingRef = useRef(null);
 
   useEffect(() => {
     const savedHistory = localStorage.getItem('psp_market_order_history');
-    if (savedHistory) {
-      setOrderHistory(JSON.parse(savedHistory));
-    }
+    if (savedHistory) setOrderHistory(JSON.parse(savedHistory));
   }, []);
 
-  // Cleanup polling on unmount
   useEffect(() => {
-    return () => {
-      if (pollingRef.current) clearInterval(pollingRef.current);
-    };
+    return () => { if (pollingRef.current) clearInterval(pollingRef.current); };
   }, []);
 
-  // 🌟 Filter Order History by Role
   const filteredHistory = orderHistory.filter(order => {
     if (userRole === 'admin') return true;
     return order.accountEmail === userEmail;
   });
 
   const deliveryServices = [
-    { id: 'home', name: 'Standard Home Delivery', rate: 1.00, eta: '1-2 Days', icon: Home },
-    { id: 'vireak', name: 'Vireak Buntham Express', rate: 1.75, eta: 'Next Day', icon: Truck },
-    { id: 'foodpanda', name: 'FoodPanda Instant', rate: 2.50, eta: '30-45 Mins', icon: ShoppingBag },
-    { id: 'wownow', name: 'WOW NOW Logistics', rate: 1.50, eta: 'Same Day', icon: Truck },
-    { id: 'egets', name: 'E-GetS Delivery', rate: 2.00, eta: '40 Mins', icon: Truck },
+    { id: 'home',     name: 'Standard Home Delivery',  rate: 1.00, eta: '1-2 Days',   icon: Home },
+    { id: 'vireak',   name: 'Vireak Buntham Express',  rate: 1.75, eta: 'Next Day',    icon: Truck },
+    { id: 'foodpanda',name: 'FoodPanda Instant',        rate: 2.50, eta: '30-45 Mins', icon: ShoppingBag },
+    { id: 'wownow',   name: 'WOW NOW Logistics',        rate: 1.50, eta: 'Same Day',   icon: Truck },
+    { id: 'egets',    name: 'E-GetS Delivery',          rate: 2.00, eta: '40 Mins',    icon: Truck },
   ];
 
   const handleDeliveryChange = (serviceName, rate) => {
@@ -3546,55 +3533,85 @@ export default function Cart({ userEmail, userRole }) {
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const grandTotal = subtotal + shippingFee;
 
+  // ============================================================
+  // 🌟 SEND TELEGRAM — Two messages:
+  //    1. Full order details
+  //    2. A real inline button to confirm payment with one tap
+  // ============================================================
   const sendTelegramAlert = async (invoiceData) => {
-    const TELEGRAM_BOT_TOKEN = "8999298089:AAHxNNQFkXy6Toucptt8oHt25yTVfago8jg"; 
-    const TELEGRAM_CHAT_ID = "6710148858";     
+    const TELEGRAM_BOT_TOKEN = "8999298089:AAHxNNQFkXy6Toucptt8oHt25yTVfago8jg";
+    const TELEGRAM_CHAT_ID   = "6710148858";
+    const CONFIRM_SECRET     = "pspmart2024"; // must match your .env CONFIRM_SECRET
 
-    let itemDetails = invoiceData.items.map(item => 
-      `📦 <b>${item.name}</b> (x${item.quantity}) - $${(item.price * item.quantity).toFixed(2)}`
-    ).join('\n');
+    const itemDetails = invoiceData.items
+      .map(item => `📦 <b>${item.name}</b> (x${item.quantity}) — $${(item.price * item.quantity).toFixed(2)}`)
+      .join('\n');
 
-    const htmlMessage = `
-🛍️ <b>💥 ORDER UPDATE - PSP MART 💥</b>
+    // ── Message 1: full order info ──
+    const orderMessage = `
+🛍️ <b>💥 NEW ORDER — PSP MART 💥</b>
 ━━━━━━━━━━━━━━━━━━━━━
-🆔 <b>Invoice Reference:</b> <code>#${invoiceData.id}</code>
-📅 <b>Timestamp:</b> ${invoiceData.date}
-💵 <b>Grand Valuation Total:</b> <u>$${invoiceData.total.toFixed(2)}</u>
+🆔 <b>Invoice:</b> <code>#${invoiceData.id}</code>
+📅 <b>Time:</b> ${invoiceData.date}
+💵 <b>Total:</b> <u>$${invoiceData.total.toFixed(2)}</u>
 <i>(Subtotal: $${invoiceData.subtotal.toFixed(2)} + Shipping: $${invoiceData.shippingFee.toFixed(2)})</i>
 
-🚚 <b>Logistics Carrier:</b> ${invoiceData.carrier}
+🚚 <b>Carrier:</b> ${invoiceData.carrier}
 
-👤 <b>CUSTOMER PROFILE:</b>
-• <b>Account Email:</b> ${invoiceData.accountEmail}
+👤 <b>CUSTOMER:</b>
+• <b>Email:</b> ${invoiceData.accountEmail}
 • <b>Name:</b> ${invoiceData.customerName}
 • <b>Phone:</b> <code>${invoiceData.phone}</code>
-• <b>Drop-off Address:</b> ${invoiceData.address}
+• <b>Address:</b> ${invoiceData.address}
 
-🛒 <b>ITEMIZED MANIFEST:</b>
+🛒 <b>ITEMS:</b>
 ${itemDetails}
 
-📍 <b>GEOLOCATION ROUTE:</b>
-${invoiceData.mapLocation ? `<a href="${invoiceData.mapLocation}">👉 Click here to Open Map Route</a>` : '⚠️ No Google Maps Link Provided'}
+📍 <b>MAP:</b>
+${invoiceData.mapLocation ? `<a href="${invoiceData.mapLocation}">👉 Open Map Route</a>` : '⚠️ No map link provided'}
+━━━━━━━━━━━━━━━━━━━━━`;
 
-💳 <b>CONFIRM PAYMENT:</b>
-<a href="https://your-backend.railway.app/api/payments/confirm-link?sessionId=${invoiceData.sessionId}&secret=pspmart2024">👉 TAP HERE TO CONFIRM PAYMENT ✅</a>
-<i>Admin: reply /confirm ${invoiceData.sessionId || 'SESSION_ID'} to confirm payment</i>
-━━━━━━━━━━━━━━━━━━━━━
-🚀 <b>System Notification Status:</b> Ledger stream updated successfully. Verify transactions.
-`;
+    // ── Message 2: tap-to-confirm button ──
+    const confirmUrl = `${BACKEND_URL}/api/payments/confirm-link?sessionId=${invoiceData.sessionId}&secret=${CONFIRM_SECRET}`;
 
     try {
+      // Send order details
       await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: htmlMessage, parse_mode: 'HTML' })
+        body: JSON.stringify({
+          chat_id: TELEGRAM_CHAT_ID,
+          text: orderMessage,
+          parse_mode: 'HTML'
+        })
+      });
+
+      // Send confirm button as a separate message
+      await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: TELEGRAM_CHAT_ID,
+          text: `💳 <b>${invoiceData.customerName}</b> paid <b>$${invoiceData.total.toFixed(2)}</b>\nTap below once money is received in your QR bank account:`,
+          parse_mode: 'HTML',
+          reply_markup: {
+            inline_keyboard: [[
+              {
+                text: '✅ CONFIRM PAYMENT RECEIVED',
+                url: confirmUrl
+              }
+            ]]
+          }
+        })
       });
     } catch (err) {
-      console.error("Telegram system pipeline failure:", err);
+      console.error("Telegram alert failed:", err);
     }
   };
 
-  // 🌟 UPDATED: Creates session on backend then starts polling
+  // ============================================================
+  // 🌟 PROCEED TO PAYMENT — creates session + starts polling
+  // ============================================================
   const handleProceedToPayment = async () => {
     setFormError('');
     if (!customerName.trim() || !phoneNumber.trim() || !address.trim()) {
@@ -3602,11 +3619,9 @@ ${invoiceData.mapLocation ? `<a href="${invoiceData.mapLocation}">👉 Click her
       return;
     }
 
-    // Generate unique session ID for this payment
     const sessionId = `pay_${Date.now()}_${Math.floor(Math.random() * 9000 + 1000)}`;
     setPaymentSessionId(sessionId);
 
-    // Register session on backend
     try {
       await fetch(`${BACKEND_URL}/api/payments/create`, {
         method: 'POST',
@@ -3619,10 +3634,10 @@ ${invoiceData.mapLocation ? `<a href="${invoiceData.mapLocation}">👉 Click her
 
     setShowQrModal(true);
 
-    // 🌟 Poll every 3 seconds — auto-fires when Telegram bot confirms payment
+    // Poll every 3 seconds — auto-fires when you tap confirm in Telegram
     pollingRef.current = setInterval(async () => {
       try {
-        const res = await fetch(`${BACKEND_URL}/api/payments/status/${sessionId}`);
+        const res  = await fetch(`${BACKEND_URL}/api/payments/status/${sessionId}`);
         const data = await res.json();
         if (data.status === 'paid') {
           clearInterval(pollingRef.current);
@@ -3635,43 +3650,42 @@ ${invoiceData.mapLocation ? `<a href="${invoiceData.mapLocation}">👉 Click her
     }, 3000);
   };
 
-  // Cancel QR and stop polling
   const handleCancelQr = () => {
     if (pollingRef.current) clearInterval(pollingRef.current);
     setPaymentSessionId(null);
     setShowQrModal(false);
   };
 
-  // 🌟 UPDATED: Accepts sessionId param for auto-trigger compatibility
+  // ============================================================
+  // 🌟 FINALIZE PAYMENT — called automatically when paid
+  // ============================================================
   const handleFinalizePayment = async (sessionId = paymentSessionId) => {
     setShowQrModal(false);
 
-    const formattedDate = new Date().toLocaleDateString('en-US', { 
-      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+    const formattedDate = new Date().toLocaleDateString('en-US', {
+      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
     });
 
     const existingOrderIdx = orderHistory.findIndex(
-      order => order.customerName.toLowerCase().trim() === customerName.toLowerCase().trim() && 
-               order.phone.trim() === phoneNumber.trim() &&
-               order.accountEmail === userEmail
+      order =>
+        order.customerName.toLowerCase().trim() === customerName.toLowerCase().trim() &&
+        order.phone.trim() === phoneNumber.trim() &&
+        order.accountEmail === userEmail
     );
 
     let finalInvoiceData;
 
     if (existingOrderIdx !== -1) {
-      const oldOrder = orderHistory[existingOrderIdx];
+      const oldOrder    = orderHistory[existingOrderIdx];
       const mergedItems = [...oldOrder.items];
 
       cart.forEach(newItem => {
-        const matchItemIdx = mergedItems.findIndex(item => item.id === newItem.id);
-        if (matchItemIdx !== -1) {
-          mergedItems[matchItemIdx].quantity += newItem.quantity;
-        } else {
-          mergedItems.push({ ...newItem });
-        }
+        const idx = mergedItems.findIndex(i => i.id === newItem.id);
+        if (idx !== -1) mergedItems[idx].quantity += newItem.quantity;
+        else mergedItems.push({ ...newItem });
       });
 
-      const newSubtotal = mergedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const newSubtotal = mergedItems.reduce((s, i) => s + i.price * i.quantity, 0);
 
       finalInvoiceData = {
         ...oldOrder,
@@ -3685,23 +3699,23 @@ ${invoiceData.mapLocation ? `<a href="${invoiceData.mapLocation}">👉 Click her
       const updatedHistory = [...orderHistory];
       updatedHistory.splice(existingOrderIdx, 1);
       updatedHistory.unshift(finalInvoiceData);
-
       setOrderHistory(updatedHistory);
       localStorage.setItem('psp_market_order_history', JSON.stringify(updatedHistory));
+
     } else {
       const uniqueInvoiceId = Math.floor(100000 + Math.random() * 900000);
       finalInvoiceData = {
         id: uniqueInvoiceId,
-        sessionId,                  // 🌟 Store session ID in invoice
+        sessionId,
         accountEmail: userEmail,
-        customerName: customerName,
+        customerName,
         items: [...cart],
-        subtotal: subtotal,
-        shippingFee: shippingFee,
+        subtotal,
+        shippingFee,
         total: grandTotal,
         phone: phoneNumber,
-        address: address,
-        mapLocation: mapLocation,
+        address,
+        mapLocation,
         carrier: deliveryMethod,
         date: formattedDate
       };
@@ -3713,7 +3727,6 @@ ${invoiceData.mapLocation ? `<a href="${invoiceData.mapLocation}">👉 Click her
 
     setInvoiceDetails(finalInvoiceData);
     setShowInvoiceModal(true);
-
     await sendTelegramAlert(finalInvoiceData);
 
     setCustomerName('');
@@ -3728,13 +3741,16 @@ ${invoiceData.mapLocation ? `<a href="${invoiceData.mapLocation}">👉 Click her
     if (!invoiceDetails) return;
     const shareText = `PSP Mart Order #${invoiceDetails.id}\nTotal: $${invoiceDetails.total.toFixed(2)}`;
     if (navigator.share) {
-      try { await navigator.share({ title: 'PSP Mart Receipt', text: shareText, url: window.location.href }); } catch (err) {}
+      try { await navigator.share({ title: 'PSP Mart Receipt', text: shareText, url: window.location.href }); } catch (e) {}
     } else {
       navigator.clipboard.writeText(shareText);
       alert('Invoice copied to clipboard!');
     }
   };
 
+  // ============================================================
+  // RENDER
+  // ============================================================
   return (
     <div className="max-w-6xl mx-auto font-sans px-4 print:hidden">
 
@@ -3743,30 +3759,34 @@ ${invoiceData.mapLocation ? `<a href="${invoiceData.mapLocation}">👉 Click her
           <ShoppingBag className="h-12 w-12 text-gray-300 mx-auto mb-4" />
           <h2 className="text-base font-bold text-gray-900 mb-1">Your shopping cart is empty</h2>
           <p className="text-gray-400 mb-6">Explore our live digital catalogs and add active products to initiate premium secure checkout workflows.</p>
-          <button 
+          <button
             onClick={() => setShowHistoryModal(true)}
             className="inline-flex items-center gap-2 border border-gray-200 hover:bg-gray-50 text-gray-700 font-bold px-4 py-2.5 rounded-xl text-xs transition shadow-sm"
           >
-            <History size={14} className="text-blue-600" /> 
-            {userRole === 'admin' ? `View Total Sales History (${filteredHistory.length})` : `Your Purchase History (${filteredHistory.length})`}
+            <History size={14} className="text-blue-600" />
+            {userRole === 'admin'
+              ? `View Total Sales History (${filteredHistory.length})`
+              : `Your Purchase History (${filteredHistory.length})`}
           </button>
         </div>
+
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
           <div className="lg:col-span-2 space-y-6">
+
+            {/* Cart Items */}
             <div className="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
               <div className="flex justify-between items-center border-b border-gray-100 pb-4 mb-4">
                 <h2 className="text-base font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
                   <ShoppingBag size={18} className="text-blue-700" /> Review Items ({cart.length})
                 </h2>
-                <button 
+                <button
                   onClick={() => setShowHistoryModal(true)}
                   className="text-blue-600 hover:text-blue-700 font-bold text-xs flex items-center gap-1 bg-blue-50 py-1.5 px-3 rounded-lg transition"
                 >
                   <History size={13} /> {userRole === 'admin' ? 'Total Sales' : 'My History'} ({filteredHistory.length})
                 </button>
               </div>
-
               <div className="divide-y divide-gray-100">
                 {cart.map(item => (
                   <div key={item.id} className="flex items-center justify-between py-4 first:pt-0 last:pb-0 text-xs">
@@ -3790,59 +3810,67 @@ ${invoiceData.mapLocation ? `<a href="${invoiceData.mapLocation}">👉 Click her
               </div>
             </div>
 
-            {/* LOGISTICS FORM */}
+            {/* Delivery Form */}
             <div className="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm text-xs">
               <h2 className="font-black text-gray-900 uppercase tracking-wider border-b border-gray-100 pb-4 mb-4 flex items-center gap-2">
                 <MapPin size={18} className="text-blue-700" /> Delivery Routing Metadata
               </h2>
-              {formError && <div className="bg-red-50 text-red-600 p-3 rounded-xl mb-4 font-semibold text-center border border-red-100">{formError}</div>}
+              {formError && (
+                <div className="bg-red-50 text-red-600 p-3 rounded-xl mb-4 font-semibold text-center border border-red-100">{formError}</div>
+              )}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block font-bold text-gray-700 uppercase tracking-wide mb-1.5">Recipient Full Name *</label>
                   <div className="relative">
                     <User size={14} className="absolute left-3.5 top-3.5 text-gray-400" />
-                    <input type="text" placeholder="e.g., Phy Sopheak" value={customerName} onChange={(e) => setCustomerName(e.target.value)} className="w-full pl-9 pr-3.5 py-2.5 bg-slate-50 border border-gray-200 rounded-xl focus:border-blue-500 focus:bg-white outline-none transition" />
+                    <input type="text" placeholder="e.g., Phy Sopheak" value={customerName} onChange={e => setCustomerName(e.target.value)}
+                      className="w-full pl-9 pr-3.5 py-2.5 bg-slate-50 border border-gray-200 rounded-xl focus:border-blue-500 focus:bg-white outline-none transition" />
                   </div>
                 </div>
                 <div>
                   <label className="block font-bold text-gray-700 uppercase tracking-wide mb-1.5">Contact Phone Number *</label>
                   <div className="relative">
                     <Phone size={14} className="absolute left-3.5 top-3.5 text-gray-400" />
-                    <input type="text" placeholder="e.g., 012 345 678" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} className="w-full pl-9 pr-3.5 py-2.5 bg-slate-50 border border-gray-200 rounded-xl focus:border-blue-500 focus:bg-white outline-none transition" />
+                    <input type="text" placeholder="e.g., 012 345 678" value={phoneNumber} onChange={e => setPhoneNumber(e.target.value)}
+                      className="w-full pl-9 pr-3.5 py-2.5 bg-slate-50 border border-gray-200 rounded-xl focus:border-blue-500 focus:bg-white outline-none transition" />
                   </div>
                 </div>
                 <div className="md:col-span-2">
                   <label className="block font-bold text-gray-700 uppercase tracking-wide mb-1.5">Drop-off Street Address *</label>
                   <div className="relative">
                     <Home size={14} className="absolute left-3.5 top-3.5 text-gray-400" />
-                    <input type="text" placeholder="Street No, House No, Sangkat, Khan..." value={address} onChange={(e) => setAddress(e.target.value)} className="w-full pl-9 pr-3.5 py-2.5 bg-slate-50 border border-gray-200 rounded-xl focus:border-blue-500 focus:bg-white outline-none transition" />
+                    <input type="text" placeholder="Street No, House No, Sangkat, Khan..." value={address} onChange={e => setAddress(e.target.value)}
+                      className="w-full pl-9 pr-3.5 py-2.5 bg-slate-50 border border-gray-200 rounded-xl focus:border-blue-500 focus:bg-white outline-none transition" />
                   </div>
                 </div>
                 <div className="md:col-span-2">
                   <label className="block font-bold text-gray-700 uppercase tracking-wide mb-1.5">Google Maps Link (Optional)</label>
                   <div className="relative">
                     <MapPin size={14} className="absolute left-3.5 top-3.5 text-gray-400" />
-                    <input type="url" placeholder="http://maps.google.com/..." value={mapLocation} onChange={(e) => setMapLocation(e.target.value)} className="w-full pl-9 pr-3.5 py-2.5 bg-slate-50 border border-gray-200 rounded-xl focus:border-blue-500 focus:bg-white outline-none transition" />
+                    <input type="url" placeholder="http://maps.google.com/..." value={mapLocation} onChange={e => setMapLocation(e.target.value)}
+                      className="w-full pl-9 pr-3.5 py-2.5 bg-slate-50 border border-gray-200 rounded-xl focus:border-blue-500 focus:bg-white outline-none transition" />
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* COLUMN 3 */}
+          {/* Sidebar */}
           <div className="space-y-6">
+            {/* Carrier */}
             <div className="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm text-xs">
               <h2 className="font-black text-gray-900 uppercase tracking-wider border-b border-gray-100 pb-3 mb-4 flex items-center gap-2">
                 <Truck size={16} className="text-blue-700" /> Logistics Carrier
               </h2>
               <div className="space-y-2">
-                {deliveryServices.map((service) => {
-                  const IconComponent = service.icon;
-                  const isSelected = deliveryMethod === service.name;
+                {deliveryServices.map(service => {
+                  const Icon = service.icon;
+                  const selected = deliveryMethod === service.name;
                   return (
-                    <label key={service.id} onClick={() => handleDeliveryChange(service.name, service.rate)} className={`flex items-center justify-between p-3 border rounded-xl cursor-pointer transition ${isSelected ? 'border-blue-600 bg-blue-50/50 font-bold text-blue-900 shadow-sm' : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'}`}>
+                    <label key={service.id} onClick={() => handleDeliveryChange(service.name, service.rate)}
+                      className={`flex items-center justify-between p-3 border rounded-xl cursor-pointer transition ${selected ? 'border-blue-600 bg-blue-50/50 font-bold text-blue-900 shadow-sm' : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'}`}>
                       <div className="flex items-center space-x-3">
-                        <IconComponent size={16} className={isSelected ? 'text-blue-600' : 'text-gray-400'} />
+                        <Icon size={16} className={selected ? 'text-blue-600' : 'text-gray-400'} />
                         <div>
                           <span className="block font-bold">{service.name}</span>
                           <span className="text-[10px] text-gray-400">ETA: {service.eta}</span>
@@ -3850,7 +3878,7 @@ ${invoiceData.mapLocation ? `<a href="${invoiceData.mapLocation}">👉 Click her
                       </div>
                       <div className="text-right">
                         <span className="block font-black text-blue-600">${service.rate.toFixed(2)}</span>
-                        <input type="radio" checked={isSelected} readOnly className="h-3 w-3 text-blue-600 mt-0.5" />
+                        <input type="radio" checked={selected} readOnly className="h-3 w-3 text-blue-600 mt-0.5" />
                       </div>
                     </label>
                   );
@@ -3858,6 +3886,7 @@ ${invoiceData.mapLocation ? `<a href="${invoiceData.mapLocation}">👉 Click her
               </div>
             </div>
 
+            {/* Billing */}
             <div className="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm text-xs">
               <h2 className="font-black text-gray-900 uppercase tracking-wider border-b border-gray-100 pb-3 mb-4 flex items-center gap-2">
                 <DollarSign size={16} className="text-blue-700" /> Premium Billing Order
@@ -3874,7 +3903,8 @@ ${invoiceData.mapLocation ? `<a href="${invoiceData.mapLocation}">👉 Click her
                 <span className="font-black text-gray-900 uppercase text-xs">Total Valuation</span>
                 <span className="text-lg font-black text-blue-700">${grandTotal.toFixed(2)}</span>
               </div>
-              <button onClick={handleProceedToPayment} className="w-full bg-blue-700 hover:bg-blue-800 text-white font-black py-3.5 rounded-xl transition shadow-md uppercase tracking-wider text-xs">
+              <button onClick={handleProceedToPayment}
+                className="w-full bg-blue-700 hover:bg-blue-800 text-white font-black py-3.5 rounded-xl transition shadow-md uppercase tracking-wider text-xs">
                 Authorize Payment via KHQR
               </button>
             </div>
@@ -3882,7 +3912,9 @@ ${invoiceData.mapLocation ? `<a href="${invoiceData.mapLocation}">👉 Click her
         </div>
       )}
 
-      {/* 🌟 KHQR MODAL — Auto-detects payment, no manual button needed */}
+      {/* ============================================================
+          🌟 KHQR MODAL — Pulse animation, auto-detects payment
+          ============================================================ */}
       {showQrModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl">
@@ -3894,28 +3926,25 @@ ${invoiceData.mapLocation ? `<a href="${invoiceData.mapLocation}">👉 Click her
               <img src={khqrImage} alt="KHQR" className="w-48 h-48 object-contain mx-auto" />
             </div>
 
-            {/* 🌟 Auto-detection pulse banner */}
+            {/* Pulse waiting banner */}
             <div className="flex items-center justify-center gap-2 text-xs text-blue-700 font-bold bg-blue-50 border border-blue-100 py-2.5 px-4 rounded-xl mb-3">
               <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse inline-block"></span>
               Waiting for payment… will confirm automatically
             </div>
 
-            {/* Session ID shown for admin reference */}
             <p className="text-[10px] text-gray-400 mb-4">
-              Session: <code className="bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">{paymentSessionId}</code>
+              Once you transfer the exact amount, your order will be confirmed instantly.
             </p>
 
-            <button
-              onClick={handleCancelQr}
-              className="w-full border border-gray-200 text-gray-500 py-3 rounded-xl hover:bg-gray-50 text-xs font-bold transition"
-            >
+            <button onClick={handleCancelQr}
+              className="w-full border border-gray-200 text-gray-500 py-3 rounded-xl hover:bg-gray-50 text-xs font-bold transition">
               Cancel
             </button>
           </div>
         </div>
       )}
 
-      {/* DYNAMIC INVOICE MODAL */}
+      {/* Invoice Modal */}
       {showInvoiceModal && invoiceDetails && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[60] animate-in fade-in zoom-in-95 duration-150">
           <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-gray-100">
@@ -3925,7 +3954,6 @@ ${invoiceData.mapLocation ? `<a href="${invoiceData.mapLocation}">👉 Click her
                 <h2 className="text-xl font-black tracking-wide text-gray-900 uppercase">PSP MART INVOICE</h2>
                 <p className="text-gray-400 text-[10px]">High Quality Product Logistics Ecosystem</p>
               </div>
-
               <div className="grid grid-cols-2 gap-y-2 py-4 border-b border-gray-100 text-[11px]">
                 <div><span className="text-gray-400 block">Invoice ID</span><span className="font-bold text-gray-900">#{invoiceDetails.id}</span></div>
                 <div className="text-right"><span className="text-gray-400 block">Date Issued</span><span className="font-medium text-gray-600">{invoiceDetails.date}</span></div>
@@ -3936,7 +3964,6 @@ ${invoiceData.mapLocation ? `<a href="${invoiceData.mapLocation}">👉 Click her
                 <div className="col-span-2"><span className="text-gray-400 block">Buyer Account</span><span className="font-medium text-blue-600">{invoiceDetails.accountEmail}</span></div>
                 <div className="col-span-2"><span className="text-gray-400 block">Delivery Destination</span><span className="font-medium text-gray-900 line-clamp-2">{invoiceDetails.address}</span></div>
               </div>
-
               <div className="py-3 border-b border-dashed border-gray-300">
                 <span className="block font-black uppercase tracking-wider text-gray-400 text-[9px] mb-2">Itemized Invoice Manifest</span>
                 <div className="max-h-[160px] overflow-y-auto space-y-2 pr-1">
@@ -3948,13 +3975,11 @@ ${invoiceData.mapLocation ? `<a href="${invoiceData.mapLocation}">👉 Click her
                   ))}
                 </div>
               </div>
-
               <div className="pt-4 flex justify-between items-center text-gray-900">
                 <span className="text-xs font-black uppercase tracking-wider">Settled Amount Total</span>
                 <span className="text-xl font-black text-green-600">${invoiceDetails.total.toFixed(2)}</span>
               </div>
             </div>
-
             <div className="mt-6 grid grid-cols-2 gap-3 font-bold text-xs">
               <button onClick={() => window.print()} className="flex items-center justify-center gap-1.5 border border-gray-200 text-gray-700 py-3 rounded-xl hover:bg-gray-50 shadow-sm">
                 <Download size={14} /> Print Receipt
@@ -3970,45 +3995,41 @@ ${invoiceData.mapLocation ? `<a href="${invoiceData.mapLocation}">👉 Click her
         </div>
       )}
 
-      {/* ACCOUNT PURCHASE HISTORY MODAL */}
+      {/* History Modal */}
       {showHistoryModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-2xl p-6 max-w-lg w-full shadow-2xl max-h-[80vh] flex flex-col border border-gray-100 animate-in fade-in zoom-in-95 duration-150">
             <div className="flex justify-between items-center border-b border-gray-100 pb-3 mb-4">
               <h3 className="text-base font-black text-gray-900 flex items-center gap-2 uppercase tracking-wide">
-                <Receipt size={18} className="text-blue-700" /> 
+                <Receipt size={18} className="text-blue-700" />
                 {userRole === 'admin' ? 'Total Sales Manifest (Admin)' : 'My Purchase History'}
               </h3>
               <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-bold">{filteredHistory.length} Record(s)</span>
             </div>
-
             <div className="flex-1 overflow-y-auto space-y-3.5 pr-1 text-xs">
               {filteredHistory.length === 0 ? (
                 <div className="text-center py-12 text-gray-400 italic">No historical purchase tracks found local to this account context.</div>
               ) : (
-                filteredHistory.map((historyItem) => (
+                filteredHistory.map(historyItem => (
                   <div key={historyItem.id} className="bg-slate-50/70 p-4 border border-slate-100 rounded-xl hover:border-blue-400 transition shadow-sm">
                     <div className="flex justify-between items-start mb-2">
                       <div>
-                        <span className="font-black text-gray-900 block">Reference ID: #${historyItem.id}</span>
+                        <span className="font-black text-gray-900 block">Reference ID: #{historyItem.id}</span>
                         <span className="text-[10px] text-gray-400 flex items-center gap-1 mt-0.5"><Clock size={10} /> {historyItem.date}</span>
                       </div>
                       <span className="font-black text-blue-700 text-sm">${historyItem.total.toFixed(2)}</span>
                     </div>
-
                     <div className="text-gray-500 space-y-0.5 border-t border-gray-200/60 pt-2 text-[11px]">
                       {userRole === 'admin' && (
                         <div className="text-red-600 font-bold"><span className="text-gray-700 font-semibold">Account Email:</span> {historyItem.accountEmail}</div>
                       )}
                       <div><span className="font-semibold text-gray-700">Customer:</span> {historyItem.customerName} ({historyItem.phone})</div>
-                      <div className="text-[11px] text-slate-500 italic mt-1 font-semibold">Contains {historyItem.items.reduce((sum, i) => sum + i.quantity, 0)} total item(s)</div>
+                      <div className="text-[11px] text-slate-500 italic mt-1 font-semibold">
+                        Contains {historyItem.items.reduce((sum, i) => sum + i.quantity, 0)} total item(s)
+                      </div>
                     </div>
-
-                    <button 
-                      onClick={() => { 
-                        setInvoiceDetails(historyItem); 
-                        setShowInvoiceModal(true); 
-                      }}
+                    <button
+                      onClick={() => { setInvoiceDetails(historyItem); setShowInvoiceModal(true); }}
                       className="mt-2.5 w-full bg-white border border-blue-200 text-blue-600 hover:bg-blue-50 font-bold py-2 rounded-xl text-[11px] shadow-sm transition flex items-center justify-center gap-1.5"
                     >
                       <Receipt size={13} /> View Detailed Invoice
@@ -4017,8 +4038,8 @@ ${invoiceData.mapLocation ? `<a href="${invoiceData.mapLocation}">👉 Click her
                 ))
               )}
             </div>
-
-            <button onClick={() => setShowHistoryModal(false)} className="mt-5 w-full bg-slate-900 hover:bg-black text-white font-bold py-3 rounded-xl transition text-xs tracking-wider uppercase">
+            <button onClick={() => setShowHistoryModal(false)}
+              className="mt-5 w-full bg-slate-900 hover:bg-black text-white font-bold py-3 rounded-xl transition text-xs tracking-wider uppercase">
               Return to Checkout Layout
             </button>
           </div>
