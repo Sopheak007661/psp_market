@@ -2964,7 +2964,519 @@
 
 
 
-import React, { useState, useContext, useEffect } from 'react';
+// import React, { useState, useContext, useEffect } from 'react';
+// import { ShopContext } from '../../context/ShopContext';
+// import { 
+//   Trash2, Minus, Plus, ShoppingBag, MapPin, Phone, Home, 
+//   Truck, Download, Share2, CheckCircle2, History, Receipt, 
+//   Clock, DollarSign, ShieldCheck, User 
+// } from 'lucide-react';
+
+// // 🌟 ទទួលយក userEmail និង userRole ជា Props ពី App.jsx
+// export default function Cart({ userEmail, userRole }) {
+//   const { cart, updateQuantity, removeFromCart, checkout, khqrImage } = useContext(ShopContext);
+//   const [showQrModal, setShowQrModal] = useState(false);
+//   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+//   const [showHistoryModal, setShowHistoryModal] = useState(false);
+  
+//   const [invoiceDetails, setInvoiceDetails] = useState(null);
+//   const [orderHistory, setOrderHistory] = useState([]);
+
+//   // Delivery Form States
+//   const [customerName, setCustomerName] = useState('');
+//   const [phoneNumber, setPhoneNumber] = useState('');
+//   const [address, setAddress] = useState('');
+//   const [mapLocation, setMapLocation] = useState('');
+//   const [deliveryMethod, setDeliveryMethod] = useState('Standard Home Delivery');
+//   const [shippingFee, setShippingFee] = useState(1.00);
+//   const [formError, setFormError] = useState('');
+
+//   useEffect(() => {
+//     const savedHistory = localStorage.getItem('psp_market_order_history');
+//     if (savedHistory) {
+//       setOrderHistory(JSON.parse(savedHistory));
+//     }
+//   }, []);
+
+//   // 🌟 គណនានិងចម្រាញ់ទិន្នន័យ (Filter Order History)
+//   // បើជា Admin គឺបង្ហាញទាំងអស់ បើជា User ធម្មតាបង្ហាញតែ Order ណាដែលត្រូវនឹង Email របស់ខ្លួន
+//   const filteredHistory = orderHistory.filter(order => {
+//     if (userRole === 'admin') return true; // Admin ឃើញទាំងអស់
+//     return order.accountEmail === userEmail; // User ឃើញតែរបស់ខ្លួន
+//   });
+
+//   const deliveryServices = [
+//     { id: 'home', name: 'Standard Home Delivery', rate: 1.00, eta: '1-2 Days', icon: Home },
+//     { id: 'vireak', name: 'Vireak Buntham Express', rate: 1.75, eta: 'Next Day', icon: Truck },
+//     { id: 'foodpanda', name: 'FoodPanda Instant', rate: 2.50, eta: '30-45 Mins', icon: ShoppingBag },
+//     { id: 'wownow', name: 'WOW NOW Logistics', rate: 1.50, eta: 'Same Day', icon: Truck },
+//     { id: 'egets', name: 'E-GetS Delivery', rate: 2.00, eta: '40 Mins', icon: Truck },
+//   ];
+
+//   const handleDeliveryChange = (serviceName, rate) => {
+//     setDeliveryMethod(serviceName);
+//     setShippingFee(rate);
+//   };
+
+//   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+//   const grandTotal = subtotal + shippingFee;
+
+//   const sendTelegramAlert = async (invoiceData) => {
+//     const TELEGRAM_BOT_TOKEN = "8999298089:AAHxNNQFkXy6Toucptt8oHt25yTVfago8jg"; 
+//     const TELEGRAM_CHAT_ID = "6710148858";     
+
+//     let itemDetails = invoiceData.items.map(item => `📦 <b>${item.name}</b> (x${item.quantity}) - $${(item.price * item.quantity).toFixed(2)}`).join('\n');
+    
+//     const htmlMessage = `
+// 🛍️ <b>💥 ORDER UPDATE - PSP MART 💥</b>
+// ━━━━━━━━━━━━━━━━━━━━━
+// 🆔 <b>Invoice Reference:</b> <code>#${invoiceData.id}</code>
+// 📅 <b>Timestamp:</b> ${invoiceData.date}
+// 💵 <b>Grand Valuation Total:</b> <u>$${invoiceData.total.toFixed(2)}</u>
+// <i>(Subtotal: $${invoiceData.subtotal.toFixed(2)} + Shipping: $${invoiceData.shippingFee.toFixed(2)})</i>
+
+// 🚚 <b>Logistics Carrier:</b> ${invoiceData.carrier}
+
+// 👤 <b>CUSTOMER PROFILE:</b>
+// • <b>Account Email:</b> ${invoiceData.accountEmail}
+// • <b>Name:</b> ${invoiceData.customerName}
+// • <b>Phone:</b> <code>${invoiceData.phone}</code>
+// • <b>Drop-off Address:</b> ${invoiceData.address}
+
+// 🛒 <b>ITEMIZED MANIFEST:</b>
+// ${itemDetails}
+
+// 📍 <b>GEOLOCATION ROUTE:</b>
+// ${invoiceData.mapLocation ? `<a href="${invoiceData.mapLocation}">👉 Click here to Open Map Route</a>` : '⚠️ No Google Maps Link Provided'}
+// ━━━━━━━━━━━━━━━━━━━━━
+// 🚀 <b>System Notification Status:</b> Ledger stream updated successfully. Verify transactions.
+// `;
+
+//     try {
+//       await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: htmlMessage, parse_mode: 'HTML' })
+//       });
+//     } catch (err) {
+//       console.error("Telegram system pipeline failure:", err);
+//     }
+//   };
+
+//   const handleProceedToPayment = () => {
+//     setFormError('');
+//     if (!customerName.trim() || !phoneNumber.trim() || !address.trim()) {
+//       setFormError('Required Fields Missing: Please input your Name, Phone Number, and Delivery Address.');
+//       return;
+//     }
+//     setShowQrModal(true);
+//   };
+
+//   const handleFinalizePayment = async () => {
+//     setShowQrModal(false);
+    
+//     const formattedDate = new Date().toLocaleDateString('en-US', { 
+//       year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+//     });
+
+//     // ច្របាច់បញ្ចូលវិក្កយបត្រដោយផ្អែកលើ ឈ្មោះ លេខទូរស័ព្ទ និង Email ដែលបាន Login
+//     const existingOrderIdx = orderHistory.findIndex(
+//       order => order.customerName.toLowerCase().trim() === customerName.toLowerCase().trim() && 
+//                order.phone.trim() === phoneNumber.trim() &&
+//                order.accountEmail === userEmail
+//     );
+
+//     let finalInvoiceData;
+
+//     if (existingOrderIdx !== -1) {
+//       const oldOrder = orderHistory[existingOrderIdx];
+//       const mergedItems = [...oldOrder.items];
+
+//       cart.forEach(newItem => {
+//         const matchItemIdx = mergedItems.findIndex(item => item.id === newItem.id);
+//         if (matchItemIdx !== -1) {
+//           mergedItems[matchItemIdx].quantity += newItem.quantity;
+//         } else {
+//           mergedItems.push({ ...newItem });
+//         }
+//       });
+
+//       const newSubtotal = mergedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      
+//       finalInvoiceData = {
+//         ...oldOrder,
+//         items: mergedItems,
+//         subtotal: newSubtotal,
+//         total: newSubtotal + oldOrder.shippingFee,
+//         date: formattedDate
+//       };
+
+//       const updatedHistory = [...orderHistory];
+//       updatedHistory.splice(existingOrderIdx, 1);
+//       updatedHistory.unshift(finalInvoiceData);
+      
+//       setOrderHistory(updatedHistory);
+//       localStorage.setItem('psp_market_order_history', JSON.stringify(updatedHistory));
+//     } else {
+//       const uniqueInvoiceId = Math.floor(100000 + Math.random() * 900000);
+//       finalInvoiceData = {
+//         id: uniqueInvoiceId,
+//         accountEmail: userEmail, // 🌟 រក្សាទុក Email ម្ចាស់ទិញចូលទៅក្នុងវិក្កយបត្រ
+//         customerName: customerName,
+//         items: [...cart],
+//         subtotal: subtotal,
+//         shippingFee: shippingFee,
+//         total: grandTotal,
+//         phone: phoneNumber,
+//         address: address,
+//         mapLocation: mapLocation,
+//         carrier: deliveryMethod,
+//         date: formattedDate
+//       };
+
+//       const updatedHistory = [finalInvoiceData, ...orderHistory];
+//       setOrderHistory(updatedHistory);
+//       localStorage.setItem('psp_market_order_history', JSON.stringify(updatedHistory));
+//     }
+
+//     setInvoiceDetails(finalInvoiceData);
+//     setShowInvoiceModal(true);
+    
+//     await sendTelegramAlert(finalInvoiceData);
+    
+//     setCustomerName('');
+//     setPhoneNumber('');
+//     setAddress('');
+//     setMapLocation('');
+//     checkout();
+//   };
+
+//   const handleShareInvoice = async () => {
+//     if (!invoiceDetails) return;
+//     const shareText = `PSP Mart Order #${invoiceDetails.id}\nTotal: $${invoiceDetails.total.toFixed(2)}`;
+//     if (navigator.share) {
+//       try { await navigator.share({ title: 'PSP Mart Receipt', text: shareText, url: window.location.href }); } catch (err) {}
+//     } else {
+//       navigator.clipboard.writeText(shareText);
+//       alert('Invoice copied to clipboard!');
+//     }
+//   };
+
+//   return (
+//     <div className="max-w-6xl mx-auto font-sans px-4 print:hidden">
+      
+//       {cart.length === 0 ? (
+//         <div className="max-w-md mx-auto text-center py-16 bg-white border border-gray-100 rounded-2xl shadow-sm px-6 text-xs">
+//           <ShoppingBag className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+//           <h2 className="text-base font-bold text-gray-900 mb-1">Your shopping cart is empty</h2>
+//           <p className="text-gray-400 mb-6">Explore our live digital catalogs and add active products to initiate premium secure checkout workflows.</p>
+//           <button 
+//             onClick={() => setShowHistoryModal(true)}
+//             className="inline-flex items-center gap-2 border border-gray-200 hover:bg-gray-50 text-gray-700 font-bold px-4 py-2.5 rounded-xl text-xs transition shadow-sm"
+//           >
+//             {/* 🌟 បង្ហាញចំនួនទិន្នន័យទៅតាម Role */}
+//             <History size={14} className="text-blue-600" /> 
+//             {userRole === 'admin' ? `View Total Sales History (${filteredHistory.length})` : `Your Purchase History (${filteredHistory.length})`}
+//           </button>
+//         </div>
+//       ) : (
+//         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+//           <div className="lg:col-span-2 space-y-6">
+//             <div className="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+//               <div className="flex justify-between items-center border-b border-gray-100 pb-4 mb-4">
+//                 <h2 className="text-base font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
+//                   <ShoppingBag size={18} className="text-blue-700" /> Review Items ({cart.length})
+//                 </h2>
+//                 <button 
+//                   onClick={() => setShowHistoryModal(true)}
+//                   className="text-blue-600 hover:text-blue-700 font-bold text-xs flex items-center gap-1 bg-blue-50 py-1.5 px-3 rounded-lg transition"
+//                 >
+//                   <History size={13} /> {userRole === 'admin' ? 'Total Sales' : 'My History'} ({filteredHistory.length})
+//                 </button>
+//               </div>
+
+//               <div className="divide-y divide-gray-100">
+//                 {cart.map(item => (
+//                   <div key={item.id} className="flex items-center justify-between py-4 first:pt-0 last:pb-0 text-xs">
+//                     <div className="flex items-center space-x-3.5">
+//                       <img src={item.image} alt="" className="w-14 h-14 object-cover rounded-xl border border-gray-100 shadow-sm" />
+//                       <div>
+//                         <h4 className="font-bold text-gray-900 line-clamp-1 text-sm">{item.name}</h4>
+//                         <p className="text-blue-600 font-bold text-xs mt-0.5">${Number(item.price || 0).toFixed(2)}</p>
+//                       </div>
+//                     </div>
+//                     <div className="flex items-center space-x-4">
+//                       <div className="flex items-center space-x-2 border border-gray-200 rounded-xl p-1 bg-gray-50">
+//                         <button onClick={() => updateQuantity(item.id, -1)} className="p-1 hover:bg-white rounded-lg text-gray-500 shadow-sm transition"><Minus className="h-3 w-3" /></button>
+//                         <span className="font-bold text-gray-900 px-1 w-5 text-center">{item.quantity}</span>
+//                         <button onClick={() => updateQuantity(item.id, 1)} className="p-1 hover:bg-white rounded-lg text-gray-500 shadow-sm transition"><Plus className="h-3 w-3" /></button>
+//                       </div>
+//                       <button onClick={() => removeFromCart(item.id)} className="text-gray-300 hover:text-red-500 transition"><Trash2 className="h-4 w-4" /></button>
+//                     </div>
+//                   </div>
+//                 ))}
+//               </div>
+//             </div>
+
+//             {/* LOGISTICS FORM */}
+//             <div className="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm text-xs">
+//               <h2 className="font-black text-gray-900 uppercase tracking-wider border-b border-gray-100 pb-4 mb-4 flex items-center gap-2">
+//                 <MapPin size={18} className="text-blue-700" /> Delivery Routing Metadata
+//               </h2>
+//               {formError && <div className="bg-red-50 text-red-600 p-3 rounded-xl mb-4 font-semibold text-center border border-red-100">{formError}</div>}
+//               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                 <div>
+//                   <label className="block font-bold text-gray-700 uppercase tracking-wide mb-1.5">Recipient Full Name *</label>
+//                   <div className="relative">
+//                     <User size={14} className="absolute left-3.5 top-3.5 text-gray-400" />
+//                     <input type="text" placeholder="e.g., Phy Sopheak" value={customerName} onChange={(e) => setCustomerName(e.target.value)} className="w-full pl-9 pr-3.5 py-2.5 bg-slate-50 border border-gray-200 rounded-xl focus:border-blue-500 focus:bg-white outline-none transition" />
+//                   </div>
+//                 </div>
+//                 <div>
+//                   <label className="block font-bold text-gray-700 uppercase tracking-wide mb-1.5">Contact Phone Number *</label>
+//                   <div className="relative">
+//                     <Phone size={14} className="absolute left-3.5 top-3.5 text-gray-400" />
+//                     <input type="text" placeholder="e.g., 012 345 678" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} className="w-full pl-9 pr-3.5 py-2.5 bg-slate-50 border border-gray-200 rounded-xl focus:border-blue-500 focus:bg-white outline-none transition" />
+//                   </div>
+//                 </div>
+//                 <div className="md:col-span-2">
+//                   <label className="block font-bold text-gray-700 uppercase tracking-wide mb-1.5">Drop-off Street Address *</label>
+//                   <div className="relative">
+//                     <Home size={14} className="absolute left-3.5 top-3.5 text-gray-400" />
+//                     <input type="text" placeholder="Street No, House No, Sangkat, Khan..." value={address} onChange={(e) => setAddress(e.target.value)} className="w-full pl-9 pr-3.5 py-2.5 bg-slate-50 border border-gray-200 rounded-xl focus:border-blue-500 focus:bg-white outline-none transition" />
+//                   </div>
+//                 </div>
+//                 <div className="md:col-span-2">
+//                   <label className="block font-bold text-gray-700 uppercase tracking-wide mb-1.5">Google Maps Link (Optional)</label>
+//                   <div className="relative">
+//                     <MapPin size={14} className="absolute left-3.5 top-3.5 text-gray-400" />
+//                     <input type="url" placeholder="http://maps.google.com/..." value={mapLocation} onChange={(e) => setMapLocation(e.target.value)} className="w-full pl-9 pr-3.5 py-2.5 bg-slate-50 border border-gray-200 rounded-xl focus:border-blue-500 focus:bg-white outline-none transition" />
+//                   </div>
+//                 </div>
+//               </div>
+//             </div>
+//           </div>
+
+//           {/* COLUMN 3 */}
+//           <div className="space-y-6">
+//             <div className="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm text-xs">
+//               <h2 className="font-black text-gray-900 uppercase tracking-wider border-b border-gray-100 pb-3 mb-4 flex items-center gap-2">
+//                 <Truck size={16} className="text-blue-700" /> Logistics Carrier
+//               </h2>
+//               <div className="space-y-2">
+//                 {deliveryServices.map((service) => {
+//                   const IconComponent = service.icon;
+//                   const isSelected = deliveryMethod === service.name;
+//                   return (
+//                     <label key={service.id} onClick={() => handleDeliveryChange(service.name, service.rate)} className={`flex items-center justify-between p-3 border rounded-xl cursor-pointer transition ${isSelected ? 'border-blue-600 bg-blue-50/50 font-bold text-blue-900 shadow-sm' : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'}`}>
+//                       <div className="flex items-center space-x-3">
+//                         <IconComponent size={16} className={isSelected ? 'text-blue-600' : 'text-gray-400'} />
+//                         <div>
+//                           <span className="block font-bold">{service.name}</span>
+//                           <span className="text-[10px] text-gray-400">ETA: {service.eta}</span>
+//                         </div>
+//                       </div>
+//                       <div className="text-right">
+//                         <span className="block font-black text-blue-600">${service.rate.toFixed(2)}</span>
+//                         <input type="radio" checked={isSelected} readOnly className="h-3 w-3 text-blue-600 mt-0.5" />
+//                       </div>
+//                     </label>
+//                   );
+//                 })}
+//               </div>
+//             </div>
+
+//             <div className="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm text-xs">
+//               <h2 className="font-black text-gray-900 uppercase tracking-wider border-b border-gray-100 pb-3 mb-4 flex items-center gap-2">
+//                 <DollarSign size={16} className="text-blue-700" /> Premium Billing Order
+//               </h2>
+//               <div className="space-y-3 pb-4 border-b border-gray-100 font-medium text-gray-500">
+//                 <div className="flex justify-between"><span>Cart Subtotal</span><span className="font-bold text-gray-900">${subtotal.toFixed(2)}</span></div>
+//                 <div className="flex justify-between"><span>Shipping Fee</span><span className="font-bold text-gray-900">${shippingFee.toFixed(2)}</span></div>
+//                 <div className="flex justify-between items-center bg-gray-50 p-2 rounded-xl text-[11px]">
+//                   <span className="flex items-center gap-1 text-slate-600"><ShieldCheck size={14} className="text-green-600" /> Payment Protection</span>
+//                   <span className="text-green-600 font-bold">Secured</span>
+//                 </div>
+//               </div>
+//               <div className="flex justify-between items-center pt-4 mb-5">
+//                 <span className="font-black text-gray-900 uppercase text-xs">Total Valuation</span>
+//                 <span className="text-lg font-black text-blue-700">${grandTotal.toFixed(2)}</span>
+//               </div>
+//               <button onClick={handleProceedToPayment} className="w-full bg-blue-700 hover:bg-blue-800 text-white font-black py-3.5 rounded-xl transition shadow-md uppercase tracking-wider text-xs">
+//                 Authorize Payment via KHQR
+//               </button>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* KHQR MODAL */}
+//       {showQrModal && (
+//         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+//           <div className="bg-white rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl">
+//             <h3 className="text-base font-black text-gray-900 mb-1">Scan Bakong KHQR Gateway</h3>
+//             <div className="bg-blue-50 border border-blue-100 rounded-xl py-2 px-5 my-3 inline-block">
+//               <span className="text-2xl font-black text-blue-700">${grandTotal.toFixed(2)}</span>
+//             </div>
+//             <div className="bg-white border border-gray-200 p-3 rounded-2xl inline-block mb-4">
+//               <img src={khqrImage} alt="KHQR" className="w-48 h-48 object-contain mx-auto" />
+//             </div>
+//             <div className="flex gap-3 text-xs font-bold">
+//               <button onClick={() => setShowQrModal(false)} className="w-1/2 border border-gray-200 text-gray-500 py-3 rounded-xl hover:bg-gray-50">Cancel</button>
+//               <button onClick={handleFinalizePayment} className="w-1/2 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl shadow-md">I Have Transferred</button>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* DYNAMIC INVOICE MODAL */}
+//       {showInvoiceModal && invoiceDetails && (
+//         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[60] animate-in fade-in zoom-in-95 duration-150">
+//           <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-gray-100">
+//             <div className="text-xs text-gray-800">
+//               <div className="text-center pb-4 border-b border-dashed border-gray-300">
+//                 <CheckCircle2 className="h-9 w-9 text-green-500 mx-auto mb-2" />
+//                 <h2 className="text-xl font-black tracking-wide text-gray-900 uppercase">PSP MART INVOICE</h2>
+//                 <p className="text-gray-400 text-[10px]">High Quality Product Logistics Ecosystem</p>
+//               </div>
+
+//               <div className="grid grid-cols-2 gap-y-2 py-4 border-b border-gray-100 text-[11px]">
+//                 <div><span className="text-gray-400 block">Invoice ID</span><span className="font-bold text-gray-900">#{invoiceDetails.id}</span></div>
+//                 <div className="text-right"><span className="text-gray-400 block">Date Issued</span><span className="font-medium text-gray-600">{invoiceDetails.date}</span></div>
+//                 <div><span className="text-gray-400 block">Customer Name</span><span className="font-bold text-gray-900">{invoiceDetails.customerName}</span></div>
+//                 <div className="text-right"><span className="text-gray-400 block">Contact Phone</span><span className="font-medium text-gray-900">{invoiceDetails.phone}</span></div>
+//                 <div><span className="text-gray-400 block">Logistics Partner</span><span className="font-bold text-blue-600">{invoiceDetails.carrier}</span></div>
+//                 <div className="text-right"><span className="text-gray-400 block">Shipping Fee</span><span className="font-bold text-gray-900">${invoiceDetails.shippingFee.toFixed(2)}</span></div>
+//                 <div className="col-span-2"><span className="text-gray-400 block">Buyer Account</span><span className="font-medium text-blue-600">{invoiceDetails.accountEmail}</span></div>
+//                 <div className="col-span-2"><span className="text-gray-400 block">Delivery Destination</span><span className="font-medium text-gray-900 line-clamp-2">{invoiceDetails.address}</span></div>
+//               </div>
+
+//               <div className="py-3 border-b border-dashed border-gray-300">
+//                 <span className="block font-black uppercase tracking-wider text-gray-400 text-[9px] mb-2">Itemized Invoice Manifest</span>
+//                 <div className="max-h-[160px] overflow-y-auto space-y-2 pr-1">
+//                   {invoiceDetails.items.map((item, idx) => (
+//                     <div key={idx} className="flex justify-between items-center text-[11px] bg-slate-50 p-1.5 rounded-lg border border-slate-100/60">
+//                       <span className="font-medium text-gray-900">{item.name} <span className="text-blue-600 font-bold">x{item.quantity}</span></span>
+//                       <span className="font-bold text-gray-900">${(item.price * item.quantity).toFixed(2)}</span>
+//                     </div>
+//                   ))}
+//                 </div>
+//               </div>
+
+//               <div className="pt-4 flex justify-between items-center text-gray-900">
+//                 <span className="text-xs font-black uppercase tracking-wider">Settled Amount Total</span>
+//                 <span className="text-xl font-black text-green-600">${invoiceDetails.total.toFixed(2)}</span>
+//               </div>
+//             </div>
+
+//             <div className="mt-6 grid grid-cols-2 gap-3 font-bold text-xs">
+//               <button onClick={() => window.print()} className="flex items-center justify-center gap-1.5 border border-gray-200 text-gray-700 py-3 rounded-xl hover:bg-gray-50 shadow-sm">
+//                 <Download size={14} /> Print Receipt
+//               </button>
+//               <button onClick={handleShareInvoice} className="flex items-center justify-center gap-1.5 bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 shadow-md">
+//                 <Share2 size={14} /> Share Invoice
+//               </button>
+//               <button onClick={() => setShowInvoiceModal(false)} className="col-span-2 mt-1 border border-dashed border-gray-300 text-gray-400 text-center py-2.5 rounded-xl hover:bg-gray-50">
+//                 Close Invoice Detail
+//               </button>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* ACCOUNT PURCHASE HISTORY MODAL */}
+//       {showHistoryModal && (
+//         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+//           <div className="bg-white rounded-2xl p-6 max-w-lg w-full shadow-2xl max-h-[80vh] flex flex-col border border-gray-100 animate-in fade-in zoom-in-95 duration-150">
+//             <div className="flex justify-between items-center border-b border-gray-100 pb-3 mb-4">
+//               <h3 className="text-base font-black text-gray-900 flex items-center gap-2 uppercase tracking-wide">
+//                 <Receipt size={18} className="text-blue-700" /> 
+//                 {userRole === 'admin' ? 'Total Sales Manifest (Admin)' : 'My Purchase History'}
+//               </h3>
+//               <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-bold">{filteredHistory.length} Record(s)</span>
+//             </div>
+
+//             <div className="flex-1 overflow-y-auto space-y-3.5 pr-1 text-xs">
+//               {filteredHistory.length === 0 ? (
+//                 <div className="text-center py-12 text-gray-400 italic">No historical purchase tracks found local to this account context.</div>
+//               ) : (
+//                 // 🌟 ផ្លាស់ប្តូរមកប្រើ filteredHistory ជំនួសឱ្យ orderHistory ធម្មតា
+//                 filteredHistory.map((historyItem) => (
+//                   <div key={historyItem.id} className="bg-slate-50/70 p-4 border border-slate-100 rounded-xl hover:border-blue-400 transition shadow-sm">
+//                     <div className="flex justify-between items-start mb-2">
+//                       <div>
+//                         <span className="font-black text-gray-900 block">Reference ID: #${historyItem.id}</span>
+//                         <span className="text-[10px] text-gray-400 flex items-center gap-1 mt-0.5"><Clock size={10} /> {historyItem.date}</span>
+//                       </div>
+//                       <span className="font-black text-blue-700 text-sm">${historyItem.total.toFixed(2)}</span>
+//                     </div>
+
+//                     <div className="text-gray-500 space-y-0.5 border-t border-gray-200/60 pt-2 text-[11px]">
+//                       {userRole === 'admin' && (
+//                         <div className="text-red-600 font-bold"><span className="text-gray-700 font-semibold">Account Email:</span> {historyItem.accountEmail}</div>
+//                       )}
+//                       <div><span className="font-semibold text-gray-700">Customer:</span> {historyItem.customerName} ({historyItem.phone})</div>
+//                       <div className="text-[11px] text-slate-500 italic mt-1 font-semibold">Contains {historyItem.items.reduce((sum, i) => sum + i.quantity, 0)} total item(s)</div>
+//                     </div>
+
+//                     <button 
+//                       onClick={() => { 
+//                         setInvoiceDetails(historyItem); 
+//                         setShowInvoiceModal(true); 
+//                       }}
+//                       className="mt-2.5 w-full bg-white border border-blue-200 text-blue-600 hover:bg-blue-50 font-bold py-2 rounded-xl text-[11px] shadow-sm transition flex items-center justify-center gap-1.5"
+//                     >
+//                       <Receipt size={13} /> View Detailed Invoice
+//                     </button>
+//                   </div>
+//                 ))
+//               )}
+//             </div>
+
+//             <button onClick={() => setShowHistoryModal(false)} className="mt-5 w-full bg-slate-900 hover:bg-black text-white font-bold py-3 rounded-xl transition text-xs tracking-wider uppercase">
+//               Return to Checkout Layout
+//             </button>
+//           </div>
+//         </div>
+//       )}
+
+//     </div>
+//   );
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import { ShopContext } from '../../context/ShopContext';
 import { 
   Trash2, Minus, Plus, ShoppingBag, MapPin, Phone, Home, 
@@ -2972,13 +3484,16 @@ import {
   Clock, DollarSign, ShieldCheck, User 
 } from 'lucide-react';
 
+// 🔁 Change this to your actual backend URL
+const BACKEND_URL = 'https://backend-psp-market.onrender.com';/////////////===============================================================
+
 // 🌟 ទទួលយក userEmail និង userRole ជា Props ពី App.jsx
 export default function Cart({ userEmail, userRole }) {
   const { cart, updateQuantity, removeFromCart, checkout, khqrImage } = useContext(ShopContext);
   const [showQrModal, setShowQrModal] = useState(false);
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
-  
+
   const [invoiceDetails, setInvoiceDetails] = useState(null);
   const [orderHistory, setOrderHistory] = useState([]);
 
@@ -2991,6 +3506,10 @@ export default function Cart({ userEmail, userRole }) {
   const [shippingFee, setShippingFee] = useState(1.00);
   const [formError, setFormError] = useState('');
 
+  // 🌟 Auto-payment detection states
+  const [paymentSessionId, setPaymentSessionId] = useState(null);
+  const pollingRef = useRef(null);
+
   useEffect(() => {
     const savedHistory = localStorage.getItem('psp_market_order_history');
     if (savedHistory) {
@@ -2998,11 +3517,17 @@ export default function Cart({ userEmail, userRole }) {
     }
   }, []);
 
-  // 🌟 គណនានិងចម្រាញ់ទិន្នន័យ (Filter Order History)
-  // បើជា Admin គឺបង្ហាញទាំងអស់ បើជា User ធម្មតាបង្ហាញតែ Order ណាដែលត្រូវនឹង Email របស់ខ្លួន
+  // Cleanup polling on unmount
+  useEffect(() => {
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current);
+    };
+  }, []);
+
+  // 🌟 Filter Order History by Role
   const filteredHistory = orderHistory.filter(order => {
-    if (userRole === 'admin') return true; // Admin ឃើញទាំងអស់
-    return order.accountEmail === userEmail; // User ឃើញតែរបស់ខ្លួន
+    if (userRole === 'admin') return true;
+    return order.accountEmail === userEmail;
   });
 
   const deliveryServices = [
@@ -3025,8 +3550,10 @@ export default function Cart({ userEmail, userRole }) {
     const TELEGRAM_BOT_TOKEN = "8999298089:AAHxNNQFkXy6Toucptt8oHt25yTVfago8jg"; 
     const TELEGRAM_CHAT_ID = "6710148858";     
 
-    let itemDetails = invoiceData.items.map(item => `📦 <b>${item.name}</b> (x${item.quantity}) - $${(item.price * item.quantity).toFixed(2)}`).join('\n');
-    
+    let itemDetails = invoiceData.items.map(item => 
+      `📦 <b>${item.name}</b> (x${item.quantity}) - $${(item.price * item.quantity).toFixed(2)}`
+    ).join('\n');
+
     const htmlMessage = `
 🛍️ <b>💥 ORDER UPDATE - PSP MART 💥</b>
 ━━━━━━━━━━━━━━━━━━━━━
@@ -3048,6 +3575,9 @@ ${itemDetails}
 
 📍 <b>GEOLOCATION ROUTE:</b>
 ${invoiceData.mapLocation ? `<a href="${invoiceData.mapLocation}">👉 Click here to Open Map Route</a>` : '⚠️ No Google Maps Link Provided'}
+
+🔑 <b>Payment Session ID:</b> <code>${invoiceData.sessionId || 'N/A'}</code>
+<i>Admin: reply /confirm ${invoiceData.sessionId || 'SESSION_ID'} to confirm payment</i>
 ━━━━━━━━━━━━━━━━━━━━━
 🚀 <b>System Notification Status:</b> Ledger stream updated successfully. Verify transactions.
 `;
@@ -3063,23 +3593,62 @@ ${invoiceData.mapLocation ? `<a href="${invoiceData.mapLocation}">👉 Click her
     }
   };
 
-  const handleProceedToPayment = () => {
+  // 🌟 UPDATED: Creates session on backend then starts polling
+  const handleProceedToPayment = async () => {
     setFormError('');
     if (!customerName.trim() || !phoneNumber.trim() || !address.trim()) {
       setFormError('Required Fields Missing: Please input your Name, Phone Number, and Delivery Address.');
       return;
     }
+
+    // Generate unique session ID for this payment
+    const sessionId = `pay_${Date.now()}_${Math.floor(Math.random() * 9000 + 1000)}`;
+    setPaymentSessionId(sessionId);
+
+    // Register session on backend
+    try {
+      await fetch(`${BACKEND_URL}/api/payments/create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId, amount: grandTotal, customerName })
+      });
+    } catch (err) {
+      console.error('Failed to create payment session:', err);
+    }
+
     setShowQrModal(true);
+
+    // 🌟 Poll every 3 seconds — auto-fires when Telegram bot confirms payment
+    pollingRef.current = setInterval(async () => {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/payments/status/${sessionId}`);
+        const data = await res.json();
+        if (data.status === 'paid') {
+          clearInterval(pollingRef.current);
+          setShowQrModal(false);
+          await handleFinalizePayment(sessionId); // ✅ AUTO TRIGGER
+        }
+      } catch (err) {
+        console.error('Polling error:', err);
+      }
+    }, 3000);
   };
 
-  const handleFinalizePayment = async () => {
+  // Cancel QR and stop polling
+  const handleCancelQr = () => {
+    if (pollingRef.current) clearInterval(pollingRef.current);
+    setPaymentSessionId(null);
     setShowQrModal(false);
-    
+  };
+
+  // 🌟 UPDATED: Accepts sessionId param for auto-trigger compatibility
+  const handleFinalizePayment = async (sessionId = paymentSessionId) => {
+    setShowQrModal(false);
+
     const formattedDate = new Date().toLocaleDateString('en-US', { 
       year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' 
     });
 
-    // ច្របាច់បញ្ចូលវិក្កយបត្រដោយផ្អែកលើ ឈ្មោះ លេខទូរស័ព្ទ និង Email ដែលបាន Login
     const existingOrderIdx = orderHistory.findIndex(
       order => order.customerName.toLowerCase().trim() === customerName.toLowerCase().trim() && 
                order.phone.trim() === phoneNumber.trim() &&
@@ -3102,9 +3671,10 @@ ${invoiceData.mapLocation ? `<a href="${invoiceData.mapLocation}">👉 Click her
       });
 
       const newSubtotal = mergedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      
+
       finalInvoiceData = {
         ...oldOrder,
+        sessionId,
         items: mergedItems,
         subtotal: newSubtotal,
         total: newSubtotal + oldOrder.shippingFee,
@@ -3114,14 +3684,15 @@ ${invoiceData.mapLocation ? `<a href="${invoiceData.mapLocation}">👉 Click her
       const updatedHistory = [...orderHistory];
       updatedHistory.splice(existingOrderIdx, 1);
       updatedHistory.unshift(finalInvoiceData);
-      
+
       setOrderHistory(updatedHistory);
       localStorage.setItem('psp_market_order_history', JSON.stringify(updatedHistory));
     } else {
       const uniqueInvoiceId = Math.floor(100000 + Math.random() * 900000);
       finalInvoiceData = {
         id: uniqueInvoiceId,
-        accountEmail: userEmail, // 🌟 រក្សាទុក Email ម្ចាស់ទិញចូលទៅក្នុងវិក្កយបត្រ
+        sessionId,                  // 🌟 Store session ID in invoice
+        accountEmail: userEmail,
         customerName: customerName,
         items: [...cart],
         subtotal: subtotal,
@@ -3141,13 +3712,14 @@ ${invoiceData.mapLocation ? `<a href="${invoiceData.mapLocation}">👉 Click her
 
     setInvoiceDetails(finalInvoiceData);
     setShowInvoiceModal(true);
-    
+
     await sendTelegramAlert(finalInvoiceData);
-    
+
     setCustomerName('');
     setPhoneNumber('');
     setAddress('');
     setMapLocation('');
+    setPaymentSessionId(null);
     checkout();
   };
 
@@ -3164,7 +3736,7 @@ ${invoiceData.mapLocation ? `<a href="${invoiceData.mapLocation}">👉 Click her
 
   return (
     <div className="max-w-6xl mx-auto font-sans px-4 print:hidden">
-      
+
       {cart.length === 0 ? (
         <div className="max-w-md mx-auto text-center py-16 bg-white border border-gray-100 rounded-2xl shadow-sm px-6 text-xs">
           <ShoppingBag className="h-12 w-12 text-gray-300 mx-auto mb-4" />
@@ -3174,7 +3746,6 @@ ${invoiceData.mapLocation ? `<a href="${invoiceData.mapLocation}">👉 Click her
             onClick={() => setShowHistoryModal(true)}
             className="inline-flex items-center gap-2 border border-gray-200 hover:bg-gray-50 text-gray-700 font-bold px-4 py-2.5 rounded-xl text-xs transition shadow-sm"
           >
-            {/* 🌟 បង្ហាញចំនួនទិន្នន័យទៅតាម Role */}
             <History size={14} className="text-blue-600" /> 
             {userRole === 'admin' ? `View Total Sales History (${filteredHistory.length})` : `Your Purchase History (${filteredHistory.length})`}
           </button>
@@ -3310,7 +3881,7 @@ ${invoiceData.mapLocation ? `<a href="${invoiceData.mapLocation}">👉 Click her
         </div>
       )}
 
-      {/* KHQR MODAL */}
+      {/* 🌟 KHQR MODAL — Auto-detects payment, no manual button needed */}
       {showQrModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl">
@@ -3318,13 +3889,27 @@ ${invoiceData.mapLocation ? `<a href="${invoiceData.mapLocation}">👉 Click her
             <div className="bg-blue-50 border border-blue-100 rounded-xl py-2 px-5 my-3 inline-block">
               <span className="text-2xl font-black text-blue-700">${grandTotal.toFixed(2)}</span>
             </div>
-            <div className="bg-white border border-gray-200 p-3 rounded-2xl inline-block mb-4">
+            <div className="bg-white border border-gray-200 p-3 rounded-2xl inline-block mb-3">
               <img src={khqrImage} alt="KHQR" className="w-48 h-48 object-contain mx-auto" />
             </div>
-            <div className="flex gap-3 text-xs font-bold">
-              <button onClick={() => setShowQrModal(false)} className="w-1/2 border border-gray-200 text-gray-500 py-3 rounded-xl hover:bg-gray-50">Cancel</button>
-              <button onClick={handleFinalizePayment} className="w-1/2 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl shadow-md">I Have Transferred</button>
+
+            {/* 🌟 Auto-detection pulse banner */}
+            <div className="flex items-center justify-center gap-2 text-xs text-blue-700 font-bold bg-blue-50 border border-blue-100 py-2.5 px-4 rounded-xl mb-3">
+              <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse inline-block"></span>
+              Waiting for payment… will confirm automatically
             </div>
+
+            {/* Session ID shown for admin reference */}
+            <p className="text-[10px] text-gray-400 mb-4">
+              Session: <code className="bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">{paymentSessionId}</code>
+            </p>
+
+            <button
+              onClick={handleCancelQr}
+              className="w-full border border-gray-200 text-gray-500 py-3 rounded-xl hover:bg-gray-50 text-xs font-bold transition"
+            >
+              Cancel
+            </button>
           </div>
         </div>
       )}
@@ -3400,7 +3985,6 @@ ${invoiceData.mapLocation ? `<a href="${invoiceData.mapLocation}">👉 Click her
               {filteredHistory.length === 0 ? (
                 <div className="text-center py-12 text-gray-400 italic">No historical purchase tracks found local to this account context.</div>
               ) : (
-                // 🌟 ផ្លាស់ប្តូរមកប្រើ filteredHistory ជំនួសឱ្យ orderHistory ធម្មតា
                 filteredHistory.map((historyItem) => (
                   <div key={historyItem.id} className="bg-slate-50/70 p-4 border border-slate-100 rounded-xl hover:border-blue-400 transition shadow-sm">
                     <div className="flex justify-between items-start mb-2">
