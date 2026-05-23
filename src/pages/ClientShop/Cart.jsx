@@ -3537,77 +3537,79 @@ export default function Cart({ userEmail, userRole }) {
   // 🌟 SEND TELEGRAM — Two messages:
   //    1. Full order details
   //    2. A real inline button to confirm payment with one tap
-  // ============================================================
-  const sendTelegramAlert = async (invoiceData) => {
+ // ============================================================
+// Replace your ENTIRE sendTelegramAlert function with this
+// inside Cart.jsx
+// ============================================================
+
+const sendTelegramAlert = async (invoiceData) => {
     const TELEGRAM_BOT_TOKEN = "8999298089:AAHxNNQFkXy6Toucptt8oHt25yTVfago8jg";
     const TELEGRAM_CHAT_ID   = "6710148858";
-    const CONFIRM_SECRET     = "pspmart2024"; // must match your .env CONFIRM_SECRET
+    const CONFIRM_SECRET     = "pspmart2024"; // same as your .env CONFIRM_SECRET
 
     const itemDetails = invoiceData.items
-      .map(item => `📦 <b>${item.name}</b> (x${item.quantity}) — $${(item.price * item.quantity).toFixed(2)}`)
+      .map(item => `📦 ${item.name} (x${item.quantity}) — $${(item.price * item.quantity).toFixed(2)}`)
       .join('\n');
 
-    // ── Message 1: full order info ──
-    const orderMessage = `
-🛍️ <b>💥 NEW ORDER — PSP MART 💥</b>
+    // ── Message 1: Order details (plain text, no HTML to avoid link issues) ──
+    const orderText =
+`🛍️ NEW ORDER — PSP MART
 ━━━━━━━━━━━━━━━━━━━━━
-🆔 <b>Invoice:</b> <code>#${invoiceData.id}</code>
-📅 <b>Time:</b> ${invoiceData.date}
-💵 <b>Total:</b> <u>$${invoiceData.total.toFixed(2)}</u>
-<i>(Subtotal: $${invoiceData.subtotal.toFixed(2)} + Shipping: $${invoiceData.shippingFee.toFixed(2)})</i>
+🆔 Invoice: #${invoiceData.id}
+📅 Time: ${invoiceData.date}
+💵 Total: $${invoiceData.total.toFixed(2)}
+   (Subtotal: $${invoiceData.subtotal.toFixed(2)} + Ship: $${invoiceData.shippingFee.toFixed(2)})
 
-🚚 <b>Carrier:</b> ${invoiceData.carrier}
+🚚 Carrier: ${invoiceData.carrier}
 
-👤 <b>CUSTOMER:</b>
-• <b>Email:</b> ${invoiceData.accountEmail}
-• <b>Name:</b> ${invoiceData.customerName}
-• <b>Phone:</b> <code>${invoiceData.phone}</code>
-• <b>Address:</b> ${invoiceData.address}
+👤 CUSTOMER:
+  Email:   ${invoiceData.accountEmail}
+  Name:    ${invoiceData.customerName}
+  Phone:   ${invoiceData.phone}
+  Address: ${invoiceData.address}
+${invoiceData.mapLocation ? `  Map:     ${invoiceData.mapLocation}` : ''}
 
-🛒 <b>ITEMS:</b>
+🛒 ITEMS:
 ${itemDetails}
-
-📍 <b>MAP:</b>
-${invoiceData.mapLocation ? `<a href="${invoiceData.mapLocation}">👉 Open Map Route</a>` : '⚠️ No map link provided'}
 ━━━━━━━━━━━━━━━━━━━━━`;
 
-    // ── Message 2: tap-to-confirm button ──
-    const confirmUrl = `${BACKEND_URL}/api/payments/confirm-link?sessionId=${invoiceData.sessionId}&secret=${CONFIRM_SECRET}`;
+    // ── Message 2: The confirm button (inline_keyboard with url) ──
+    const confirmUrl = `https://backend-psp-market.onrender.com/api/payments/confirm-link?sessionId=${encodeURIComponent(invoiceData.sessionId)}&secret=${encodeURIComponent(CONFIRM_SECRET)}`;
 
     try {
-      // Send order details
+      // Send order info
       await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          chat_id: TELEGRAM_CHAT_ID,
-          text: orderMessage,
-          parse_mode: 'HTML'
+          chat_id:    TELEGRAM_CHAT_ID,
+          text:       orderText,
+          parse_mode: 'Markdown'   // plain Markdown, safest
         })
       });
 
-      // Send confirm button as a separate message
+      // Send the TAP button as a separate message
       await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          chat_id: TELEGRAM_CHAT_ID,
-          text: `💳 <b>${invoiceData.customerName}</b> paid <b>$${invoiceData.total.toFixed(2)}</b>\nTap below once money is received in your QR bank account:`,
-          parse_mode: 'HTML',
+          chat_id:    TELEGRAM_CHAT_ID,
+          text:       `💳 Payment due: $${invoiceData.total.toFixed(2)} from ${invoiceData.customerName}\n\n👇 After money arrives in your account, tap this button:`,
           reply_markup: {
             inline_keyboard: [[
               {
                 text: '✅ CONFIRM PAYMENT RECEIVED',
-                url: confirmUrl
+                url:  confirmUrl
               }
             ]]
           }
         })
       });
+
     } catch (err) {
       console.error("Telegram alert failed:", err);
     }
-  };
+};
 
   // ============================================================
   // 🌟 PROCEED TO PAYMENT — creates session + starts polling
