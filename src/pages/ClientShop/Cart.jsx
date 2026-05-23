@@ -3576,7 +3576,8 @@ ${itemDetails}
 📍 <b>GEOLOCATION ROUTE:</b>
 ${invoiceData.mapLocation ? `<a href="${invoiceData.mapLocation}">👉 Click here to Open Map Route</a>` : '⚠️ No Google Maps Link Provided'}
 
-🔑 <b>Payment Session ID:</b> <code>${invoiceData.sessionId || 'N/A'}</code>
+💳 <b>CONFIRM PAYMENT:</b>
+<a href="https://your-backend.railway.app/api/payments/confirm-link?sessionId=${invoiceData.sessionId}&secret=pspmart2024">👉 TAP HERE TO CONFIRM PAYMENT ✅</a>
 <i>Admin: reply /confirm ${invoiceData.sessionId || 'SESSION_ID'} to confirm payment</i>
 ━━━━━━━━━━━━━━━━━━━━━
 🚀 <b>System Notification Status:</b> Ledger stream updated successfully. Verify transactions.
