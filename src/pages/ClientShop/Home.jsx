@@ -3,7 +3,13 @@ import React, { useContext, useState, useEffect } from 'react';
 import { ShopContext } from '../../context/ShopContext';
 import ProductCard from '../../components/ProductCard';
 
+import ProductLight from '../../components/ProductLight';
+import ContactUs from '../../components/ContactUs';
 
+import Brand1 from '../../assets/Brand1.jpg'
+import Brand3 from '../../assets/Brand3.gif'
+import Brand2 from '../../assets/Brand2.png'
+import Cart1 from '../../assets/Cart1.png'
 // import Car1 from '../../assets/Car1.png'
 // import Car2 from '../../assets/Car2.png'
 // import Car3 from '../../assets/Car3.png'
@@ -30,7 +36,7 @@ export default function Home({ setView, setSelectedProductId }) {
   const [category, setCategory] = useState('All');
 
   // 1. Setup the array of background images
-  const bgImages = [Com1,  Vege2,  Phone3,Vege3,  Car4,  Vege5   ,Car6];
+  const bgImages = [Com1,  Vege2,  Phone3,Vege3,  Car4,  Car6];
   
   // 2. State to hold the index of the currently visible background image
   const [currentBgIndex, setCurrentBgIndex] = useState(0);
@@ -92,42 +98,42 @@ export default function Home({ setView, setSelectedProductId }) {
     <div>
       {/* 4. The nav element pulls the active image string instantly from state */}
       <nav 
-        className='  bg-no-repeat bg-cover bg-center  absolute top-20 left-0 right-0  flex   transition-all duration-700 ease-in-out'
+        className='  bg-no-repeat bg-cover bg-center blur-xs opacity-1 absolute top-20 left-0 right-0  flex   transition-all duration-700 ease-in-out'
         style={{ backgroundImage: `url(${bgImages[currentBgIndex]})`,  }}
       >
         <div className="flex flex-col w-[100%] -mb-4 h-[100%]    mb-6 pb-5    p-10 justify-end  gap-20">
           <div className='flex justify-center'>
-            <div className='w-[100%] flex flex-col  gap-1 items-start'>
+            <div className='w-[100%] flex flex-col  gap-1 items-center'>
                 <h1 className="text-7xl font-black text-blue-800">market<br />online</h1>
                 <address className="text-black/85 text-xl mt-0.5 "><b className=''>Find your favourite product here....<br /> Buy now</b> </address>
             </div>
-            <div className='w-[50%] h-[80%]  bg-gradient-to-bl from-black/50 to-white/90 absolute right-0 top-0 flex items-end pl-5 pb-10 pt-20 rounded-bl-full'>
-               <div className=' hidden md:flex md:flex-wrap gap-10  '>
-                  <div className='flex flex-col bg-blue-200 p-5 '>
-                    <h3 className='text-ms border-b border-blue-800 text-blue-800 text-xl'>User</h3>
-                    <h1 className='text-green-600 text-red-600'>
+            <div className='hidden lg:flex w-[100%] h-[50%]   flex flex-row  flex items-end pl-5 pb-10 pt-0 '>
+               <div className=' hidden font-sans lg:flex md:flex-wrap gap-10  bg-gradient-to-b  from-white/45 to-whit/45 rounded-xl'>
+                  <div className='flex flex-col  p-5'>
+                    <h3 className='text-[40px]  p-4  border-b border-blue-800 text-blue-800 text-xl'>User</h3>
+                    <h1 className='h-[30px] bg-black/80 rounded-full  text-blue-600'>
                     +{count}
                     </h1>
                   </div>
-                  <div className='flex flex-col bg-blue-200 p-5 '>
-                    <h3 className='text-ms border-b border-blue-800 text-blue-800 text-xl'>Salling</h3>
-                    <h1 className='text-green-600 text-gray-700'>+1{count}</h1>
+                  <div className='flex flex-col  p-5 '>
+                    <h3 className='text-[40px] p-4  border-b border-blue-800 text-blue-800 text-xl'>Selling</h3>
+                    <h1 className='h-[30px] text-blue-600 bg-black/80 rounded-full '>+1{count}</h1>
                   </div>
-                  <div className='flex flex-col bg-blue-200 p-5 '>
-                    <h3 className='text-ms border-b border-blue-800 text-blue-800 text-xl'>Favourite</h3>
-                    <h1 className='text-green-600'>+23</h1>
+                  <div className='flex flex-col  p-5 '>
+                    <h3 className='text-[40px] p-4 border-b border-blue-800  text-blue-800 text-xl'>Favourite</h3>
+                    <h1 className='h-[30px] text-blue-600 bg-black/80 rounded-full'>+23</h1>
                   </div>
             </div>
             </div>
           </div>
           
           {/* Scrollable category list buttons */}
-          <div className="flex gap-1.5 p-10  overflow-x-auto  min-w-full md:max-w-xl lg:max-w-3xl custom-scrollbar ">
+          <div className="flex gap-1.5 p-10 justify-start md:justify-center overflow-x-auto  min-w-full md:max-w-xl lg:max-w-3xl custom-scrollbar  ">
             {categories.map(cat => (
               <button
                 key={cat}
                 onClick={() => setCategory(cat)}
-                className={`px-3.5 py-1  text-xs font-semibold whitespace-nowrap transition border ${category === cat ? 'bg-blue-800 text-white border-green-600' : 'bg-white text-gray-800 border-blue-800 hover:bg-gray-50'}`}
+                className={`px-3.5 py-1  text-xs font-semibold whitespace-nowrap transition border ${category === cat ? 'bg-blue-800 text-white border-gray-600 rounded-3xl'  : 'bg-white text-gray-800 border-blue-800 rounded-3xl hover:bg-gray-50'}`}
               >
                 {cat}
               </button>
@@ -146,7 +152,7 @@ export default function Home({ setView, setSelectedProductId }) {
       {/* Grid Condition Render */}
       <div className="p-4">
         {filtered.length === 0 ? (
-          <div className="text-center min-h-[400px] mt-[500px] py-16 bg-white border border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center ">
+          <div className="text-center min-h-[400px] mt-[400px] py-16 bg-white border border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center ">
             <p className="text-gray-400 text-sm font-medium">
               No listings found matching your criteria.
             </p>
@@ -160,7 +166,7 @@ export default function Home({ setView, setSelectedProductId }) {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-3 px-5 py-10 md:grid-cols-4 lg:grid-cols-5 gap-6  mt-[600px]  md:mt-[500px] ">  {/* overflow-auto max-h-screen */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 px-5 py-10 md:grid-cols-4 lg:grid-cols-5 gap-6 mt-[200px] md:mt-[300px] pt-[200px] md:pt-[200px] lg:pt-[400px] xl:pt-[200px]  ">  {/* overflow-auto max-h-screen */}
             {filtered.map(product => (
               <ProductCard 
                 key={product.id} 
@@ -172,6 +178,9 @@ export default function Home({ setView, setSelectedProductId }) {
           </div>
         )}
       </div>
+      {/* // Inside the return, above the grid div: */}
+      <ProductLight setView={setView} setSelectedProductId={setSelectedProductId} />
+      <ContactUs />
     </div>
   );
 }

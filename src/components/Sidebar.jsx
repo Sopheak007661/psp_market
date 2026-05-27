@@ -67,13 +67,14 @@ export default function Sidebar({ setView, currentView }) {
     { id: 'admin-graphic', name: 'Graphic Analytics', icon: LineChart },
     { id: 'admin-users', name: 'User Register', icon: Users },
     { id: 'admin-checkout', name: 'Check-In / Check-Out', icon: ShoppingCart },
-    { id: 'admin-evaluate', name: 'Evaluate Performance', icon: FileCheck }
+    { id: 'admin-evaluate', name: 'Evaluate Performance', icon: FileCheck },
+    { id: 'admin-telegram', name: 'Telegram Dashboard', icon: ShieldAlert },
   ];
 
   return (
-    <aside className="w-[100px]  md:w-64 flex bg-blue-800 text-gray-300 min-h-screen p-6 flex flex-col justify-start pt-20 gap-40 border-r border-gray-800">
+    <aside className="w-[100px]   md:w-64 flex bg-blue-800 text-gray-300 min-h-screen p-6 pt-20 flex flex-col  gap-0 border-r border-gray-800 ">
       <div>
-
+      
       </div>
       <div>
         <div className="flex items-center space-x-2 text-green-600 mb-8 px-2">
