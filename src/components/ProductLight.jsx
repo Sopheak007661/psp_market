@@ -39,14 +39,14 @@ export default function ProductLight({ setView, setSelectedProductId }) {
   };
 
   return (
-    <div className="w-full px-4 py-6 bg-white rounded-xl shadow-sm relative left=0 right-0 mx-auto abuse-pointer-events">
+    <div className="w-full px-4 py-6 [background:radial-gradient(circle_at_bottom,rgba(56,189,248,0.25)_0%,rgba(255,255,255,0)_70%)] rounded-xl shadow-sm relative left=0 right-0 mx-auto abuse-pointer-events">
 
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-          <h2 className="text-base font-semibold text-gray-800">Live products</h2>
+          {/* <h2 className="text-base font-semibold text-gray-800">Live products</h2> */}
         </div>
-        <span className="text-xs text-gray-600">New product</span>
+        {/* <span className="text-xs text-gray-600">New product</span> */}
       </div>
 
       <div className="relative">
@@ -67,7 +67,7 @@ export default function ProductLight({ setView, setSelectedProductId }) {
             {products.map(product => (
               <div
                 key={product.id}
-                className="flex-none w-40 rounded-xl border border-gray-100 bg-white overflow-hidden cursor-pointer relative"
+                className="flex-none w-60 rounded-xl border border-gray-100 bg-white overflow-hidden cursor-pointer relative"
                 style={{
                   transform: hoveredId === product.id ? 'scale(1.07)' : 'scale(1)',
                   transition: 'transform 0.25s ease, border-color 0.2s',
@@ -77,7 +77,7 @@ export default function ProductLight({ setView, setSelectedProductId }) {
                 onMouseEnter={() => setHoveredId(product.id)}
                 onMouseLeave={() => setHoveredId(null)}
               >
-                <div className="w-full h-32 overflow-hidden bg-gray-50">
+                <div className="w-[100%] h-30 overflow-hidden bg-gray-50">
                   <img
                     src={product.image}
                     alt={product.name}

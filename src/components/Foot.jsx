@@ -5,18 +5,16 @@ import BrandLogo from '../assets/BrandLogo.png'
 
 const Foot = () => {
   return (
-    /* - Added overflow-hidden to keep the glow contained inside the footer.
-      - Applied a blue radial gradient centered at the bottom, radiating upward.
-      - Keeps the text natural/black as in your original setup.
-    */
-    <div className='relative left-0 right-0 bottom-0  flex min-h-[50vh] flex-col items-center justify-center gap-10 border-t-[5px] border-gray-300 p-10 overflow-hidden bg-white text-black [background:radial-gradient(circle_at_bottom,rgba(56,189,248,0.25)_0%,rgba(255,255,255,0)_70%)]'>
+    <>
+    <hr/>
+    <div className='relative left-0 right-0 bottom-0 flex min-h-[50vh] flex-col items-center justify-center gap-10   p-10 overflow-hidden text-black bg-blue-800  '>
       
       {/* Blue Sun Core Flare at the bottom center */}
-      <div className='absolute bottom-0 left-1/2 h-[120px] w-[280px] -translate-x-1/2 rounded-t-full bg-blue-600/40 blur-2xl pointer-events-none' />
+      <div className='absolute bottom-0 left-1/2 h-[120px] w-[280px] -translate-x-1/2 rounded-t-full bg-green-600/60 blur-2xl pointer-events-none ' />
 
       <div className='z-10 flex w-full flex-wrap justify-around gap-10'>
         <div className='flex flex-col gap-8 items-start'>
-          <div className='flex flex-col items-start '>
+          <div className='flex flex-col items-start'>
             <div className='flex justify-center items-center'>
               <img src={BrandLogo} alt="BrandLogo" className='w-[120px] h-[120px] rounded-full p-3' />
               <h2 className='pt-2 cursor-pointer active:scale-95 hover:scale-105 transition-transform duration-200 font-semibold'>PSP MARKET</h2>
@@ -29,7 +27,7 @@ const Foot = () => {
           
           <div className='flex gap-2 flex-col'>
             <div>
-              <div className='flex border border-gray-400 p-2 rounded-xl cursor-pointer hover:scale-105 active:scale-95 transition-transform duration-200 bg-white/60 backdrop-blur-sm' >
+              <div className='flex border border-gray-400 p-2 rounded-xl cursor-pointer hover:scale-105 active:scale-95 transition-transform duration-200 bg-white/60 backdrop-blur-sm'>
                 <img src={Playstore} alt="Play_store" className='w-[60px] h-[50px] object-contain' />
                 <div>
                   <div>Download on the</div>
@@ -39,7 +37,7 @@ const Foot = () => {
             </div>
             <div>
               <div className='flex gap-5 border border-gray-400 p-2 rounded-xl pl-6 cursor-pointer hover:scale-105 active:scale-95 transition-transform duration-200 bg-white/60 backdrop-blur-sm'>
-                <img src={Appstore} alt="App_store" className='w-[40px] h-[50px] object-contain'  />
+                <img src={Appstore} alt="App_store" className='w-[40px] h-[50px] object-contain' />
                 <div>
                   <div>Download on the</div>
                   <b>App Store</b>
@@ -63,18 +61,18 @@ const Foot = () => {
               <li className='hover:text-blue-800 cursor-pointer border-b border-transparent hover:border-blue-600 active:border-blue-900 transition-colors'>Help center</li>
             </ul>
             <ul className='flex flex-col gap-2 items-start'>
-              <b className='hover:text-blue-800 cursor-pointer border-b border-transparent hover:border-blue-600 active:border-blue-900 transition-colors'>Social</b>
+              <b>Social</b>
               <li className='hover:text-blue-800 cursor-pointer border-b border-transparent hover:border-blue-600 active:border-blue-900 transition-colors'>
-                  <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer">Facebook</a>
+                <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer">Facebook</a>
               </li>
               <li className='hover:text-blue-800 cursor-pointer border-b border-transparent hover:border-blue-600 active:border-blue-900 transition-colors'>
-                 <a href="https://www.instagram.com/sopheak123.pheak/" target="_blank" rel="noopener noreferrer">Instagram</a>
+                <a href="https://www.instagram.com/sopheak123.pheak/" target="_blank" rel="noopener noreferrer">Instagram</a>
               </li>
               <li className='hover:text-blue-800 cursor-pointer border-b border-transparent hover:border-blue-600 active:border-blue-900 transition-colors'>
                 <a href="https://x.com/PSopheak23887" target="_blank" rel="noopener noreferrer">X (Twitter)</a>
               </li>
-           </ul>
-            <ul className='flex flex-col gap-2 items-start '>
+            </ul>
+            <ul className='flex flex-col gap-2 items-start'>
               <b>Legal</b>
               <li className='hover:text-blue-800 cursor-pointer border-b border-transparent hover:border-blue-600 active:border-blue-900 transition-colors'>Terms of Service</li>
               <li className='hover:text-blue-800 cursor-pointer border-b border-transparent hover:border-blue-600 active:border-blue-900 transition-colors'>Privacy Policy</li>
@@ -88,17 +86,55 @@ const Foot = () => {
         <div>
           <div className='flex gap-5 items-center'>
             <h3 className='hidden md:flex'>Powered by </h3>
-            <i className="fa-solid fa-shop text-green-800"></i>
+            <a href="https://www.shopify.com/collabs/creators?utm_medium=website&utm_source=shop-website&utm_campaign=shop_app_footer_for_creators" target="_blank" rel="noopener noreferrer">
+              <img src="https://cdn.shopify.com/b/shopify-brochure2-assets/ccb888cb281d840e30f3413afed693ef.svg" alt="BrandLogo" className='w-[100px] h-[30px] rounded-full p-1' />
+            </a>
             <div className='hidden md:flex'><p>|</p></div>
-            <h3 className='hidden md:flex'>Start selling for free</h3>
+            <h3 className='hidden md:flex'>All rights reserved by PSP </h3>
           </div>
         </div>
-        <div className='flex gap-5 items-center'>
-          <h3>Language Psp market</h3>
-          <i className="fa-brands fa-facebook text-green-800 cursor-pointer"></i>
+
+        {/* ✅ Updated: Circular social media icon buttons matching reference image */}
+        <div className='flex gap-3 items-center'>
+          {/* Facebook */}
+          <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer"
+            className='w-10 h-10 flex items-center justify-center rounded-full bg-black text-white hover:bg-gray-800 active:scale-95 transition-all duration-200'>
+            <i className="fa-brands fa-facebook-f text-sm"></i>
+          </a>
+          {/* X (Twitter) */}
+          <a href="https://x.com/PSopheak23887" target="_blank" rel="noopener noreferrer"
+            className='w-10 h-10 flex items-center justify-center rounded-full bg-black text-white hover:bg-gray-800 active:scale-95 transition-all duration-200'>
+            <i className="fa-brands fa-x-twitter text-sm"></i>
+          </a>
+          {/* YouTube */}
+          <a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer"
+            className='w-10 h-10 flex items-center justify-center rounded-full bg-black text-white hover:bg-gray-800 active:scale-95 transition-all duration-200'>
+            <i className="fa-brands fa-youtube text-sm"></i>
+          </a>
+          {/* Instagram */}
+          <a href="https://www.instagram.com/sopheak123.pheak/" target="_blank" rel="noopener noreferrer"
+            className='w-10 h-10 flex items-center justify-center rounded-full bg-black text-white hover:bg-gray-800 active:scale-95 transition-all duration-200'>
+            <i className="fa-brands fa-instagram text-sm"></i>
+          </a>
+          {/* TikTok */}
+          <a href="https://www.tiktok.com/" target="_blank" rel="noopener noreferrer"
+            className='w-10 h-10 flex items-center justify-center rounded-full bg-black text-white hover:bg-gray-800 active:scale-95 transition-all duration-200'>
+            <i className="fa-brands fa-tiktok text-sm"></i>
+          </a>
+          {/* LinkedIn */}
+          <a href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer"
+            className='w-10 h-10 flex items-center justify-center rounded-full bg-black text-white hover:bg-gray-800 active:scale-95 transition-all duration-200'>
+            <i className="fa-brands fa-linkedin-in text-sm"></i>
+          </a>
+          {/* Pinterest */}
+          <a href="https://www.pinterest.com/" target="_blank" rel="noopener noreferrer"
+            className='w-10 h-10 flex items-center justify-center rounded-full bg-black text-white hover:bg-gray-800 active:scale-95 transition-all duration-200'>
+            <i className="fa-brands fa-pinterest-p text-sm"></i>
+          </a>
         </div>
       </div>
     </div>
+    </>
   )
 }
 
