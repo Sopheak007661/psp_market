@@ -159,14 +159,14 @@ export default function Home({ setView, setSelectedProductId }) {
               {searchTerm && (
                 <button 
                   onClick={() => setSearchTerm('')} 
-                  className="mt-3 px-3.5 py-1.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-semibold text-xs rounded-lg transition"
+                  className=" mt-3 px-3.5 py-1.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-semibold text-xs rounded-lg transition"
                 >
                   Clear Search Term
                 </button>
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-3 [background:radial-gradient(circle_at_top,rgba(56,189,248,0.25)_0%,rgba(255,255,255,0)_70%)] px-5 py-10 md:grid-cols-4 lg:grid-cols-5 gap-16 mt-[200px] md:mt-[300px] pt-[200px] md:pt-[200px] lg:pt-[400px] xl:pt-[200px]  ">  {/* overflow-auto max-h-screen */}
+            <div className="   grid grid-cols-1 sm:grid-cols-2 [background:radial-gradient(circle_at_top,rgba(56,189,248,0.25)_0%,rgba(255,255,255,0)_70%)] px-5 py-10 md:grid-cols-3 lg:grid-cols-4 gap-16 mt-[200px] md:mt-[300px] pt-[200px] md:pt-[200px] lg:pt-[400px] xl:pt-[200px]  ">  {/* overflow-auto max-h-screen */}
               {filtered.map(product => (
                 <ProductCard 
                   key={product.id} 

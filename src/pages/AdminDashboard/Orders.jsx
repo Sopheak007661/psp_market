@@ -34,23 +34,23 @@ export default function Orders() {
   );
 
   return (
-    <div className="max-w-7xl mx-auto font-sans p-6 space-y-6">
+    <div className="max-w-7xl mx-auto font-sans p-6 space-y-6 bg-slate-300 shadow-xl shadow-blue-800 rounded-xl ">
       
       {/* 📊 KPI Stats Strip */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <div className="bg-white border border-gray-200/80 p-5 rounded-2xl shadow-xs flex items-center justify-between">
           <div>
-            <span className="text-gray-400 text-[11px] font-bold uppercase tracking-wider block mb-1">Gross Ledger Revenue</span>
+            <span className="text-blue-800 text-xl font-extrabold uppercase tracking-normal block mb-5 ">Revenue</span>
             <h3 className="text-2xl font-black text-gray-900">${totalRevenue.toFixed(2)}</h3>
           </div>
-          <div className="p-3 bg-emerald-50 rounded-xl text-emerald-600">
+          <div className="p-3 bg-emerald-50 rounded-xl text-blue-800">
             <DollarSign size={22} />
           </div>
         </div>
 
         <div className="bg-white border border-gray-200/80 p-5 rounded-2xl shadow-xs flex items-center justify-between">
           <div>
-            <span className="text-gray-400 text-[11px] font-bold uppercase tracking-wider block mb-1">Total Fulfilled Logistical Units</span>
+            <span className="text-blue-800 text-xl font-extrabold uppercase tracking-normal block mb-5 ">PRODUCTS BOUGHT</span>
             <h3 className="text-2xl font-black text-gray-900">{totalItemsSold} Units</h3>
           </div>
           <div className="p-3 bg-blue-50 rounded-xl text-blue-600">
@@ -60,7 +60,7 @@ export default function Orders() {
 
         <div className="bg-white border border-gray-200/80 p-5 rounded-2xl shadow-xs flex items-center justify-between">
           <div>
-            <span className="text-gray-400 text-[11px] font-bold uppercase tracking-wider block mb-1">System Transactions Logged</span>
+            <span className="text-blue-800 text-xl font-extrabold uppercase tracking-normal block mb-5 ">PROCESSED</span>
             <h3 className="text-2xl font-black text-gray-900">{allOrders.length} Records</h3>
           </div>
           <div className="p-3 bg-indigo-50 rounded-xl text-indigo-600">
@@ -72,7 +72,7 @@ export default function Orders() {
       {/* 🔍 Search & Filter Bar */}
       <div className="bg-white border border-gray-200 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
         <div className="relative w-full sm:max-w-md">
-          <Search size={15} className="absolute left-3.5 top-3.5 text-gray-400" />
+          <Search size={15} className="absolute left-3.5 top-3.5 text-blue-800" />
           <input 
             type="text" 
             placeholder="Search by Order ID, Client Name, or Email..." 
@@ -82,16 +82,16 @@ export default function Orders() {
           />
         </div>
         <div className="flex items-center gap-1.5 text-xs text-gray-400 font-medium bg-slate-50 px-3 py-2 rounded-xl border border-slate-100">
-          <ShieldCheck size={14} className="text-blue-600" />
-          <span>System Core status operational</span>
+          <ShieldCheck size={14} className="text-blue-800" />
+          <span>System status </span>
         </div>
       </div>
 
       {/* 📋 Central Transactions Ledger Table */}
       <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-xs">
         <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-linear-to-r from-slate-50/50 to-white">
-          <h3 className="font-black text-gray-900 text-xs uppercase tracking-wider flex items-center gap-2">
-            <Receipt size={16} className="text-blue-700" /> Historical Transaction Master Stream
+          <h3 className="font-black text-blue-800 text-xs uppercase tracking-normal flex items-center gap-2">
+            <Receipt size={16} className="text-blue-700" /> Historical Transaction
           </h3>
           <span className="text-[10px] bg-blue-50 text-blue-700 font-bold px-2 py-0.5 rounded-md">Live Storage Feed</span>
         </div>

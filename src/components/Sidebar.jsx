@@ -25,13 +25,13 @@ export default function Sidebar({ setView, currentView }) {
   ];
 
   return (
-    <aside className="w-[100px]   md:w-64 flex bg-blue-800 text-gray-300 min-h-screen p-6 pt-20 flex flex-col  gap-0 border-r border-gray-800 ">
+    <aside className="w-[100px]    md:w-64 flex  text-gray-300 min-h-screen p-6 pt-20 flex flex-col bg-slate-300  rounded-br-3xl border-r gap-0 shadow-xl shadow-slate-300 ">
       <div>
       
       </div>
       <div>
-        <div className="flex items-center space-x-2 text-green-600 mb-8 px-2">
-          <ShieldAlert className="h-5 w-5 text-green-800" />
+        <div className="flex items-center space-x-2 text-blue-800 mb-8 px-2">
+          <ShieldAlert className="h-5 w-5 text-blue-900" />
           <span className="hidden md:flex text-sm font-bold tracking-wider uppercase">PSP FUNCTION</span>
         </div>
         <nav className="space-y-1.5">
@@ -44,11 +44,11 @@ export default function Sidebar({ setView, currentView }) {
                 className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-xs font-semibold transition ${
                   currentView === item.id 
                     ? 'bg-green-600 text-white ' 
-                    : 'hover:bg-gray-800 text-gray-100 hover:text-gray-200'
+                    : 'hover:bg-gray-300 text-gray-100 hover:text-gray-200'
                 }`}
               >
-                <Icon className="h-4 w-4 flex flex-col bg-green-900 flex" />
-                <span className='hidden md:flex'>{item.name}</span>
+                <Icon className="h-4 w-4 flex flex-col  flex text-green-900" />
+                <span className='hidden md:flex text-green-900'>{item.name}</span>
               </button>
             );
           })}

@@ -1,314 +1,3 @@
-// import React, { useState, useContext } from 'react';
-// import { ShopContext } from '../../context/ShopContext';
-// import { Trash2, Plus, Upload, QrCode, X, PlusCircle, Tag } from 'lucide-react';
-
-// export default function ManageProducts() {
-//   const { products, addProduct, deleteProduct, khqrImage, setKhqrImage } = useContext(ShopContext);
-
-//   const [form, setForm] = useState({
-//     name: '',
-//     price: '',
-//     category: 'Car',
-//     description: '',
-//     image: '',
-//     variants: [], // [{ label: 'Size', options: ['S','M','L'] }, ...]
-//   });
-
-//   // Variant builder local state
-//   const [newVariantLabel, setNewVariantLabel] = useState('');
-//   const [newVariantOptions, setNewVariantOptions] = useState('');
-
-//   const handleImageUpload = (e) => {
-//     const file = e.target.files[0];
-//     if (file) {
-//       const reader = new FileReader();
-//       reader.onloadend = () => setForm({ ...form, image: reader.result });
-//       reader.readAsDataURL(file);
-//     }
-//   };
-
-//   const handleQrUpload = (e) => {
-//     const file = e.target.files[0];
-//     if (file) {
-//       const reader = new FileReader();
-//       reader.onloadend = () => {
-//         setKhqrImage(reader.result);
-//         alert('✓ System payment gateway updated with your new KHQR!');
-//       };
-//       reader.readAsDataURL(file);
-//     }
-//   };
-
-//   const addVariant = () => {
-//     const label = newVariantLabel.trim();
-//     const options = newVariantOptions
-//       .split(',')
-//       .map((o) => o.trim())
-//       .filter(Boolean);
-//     if (!label || options.length === 0) return alert('Enter a variant name and at least one option (comma-separated).');
-//     setForm({ ...form, variants: [...form.variants, { label, options }] });
-//     setNewVariantLabel('');
-//     setNewVariantOptions('');
-//   };
-
-//   const removeVariant = (index) => {
-//     setForm({ ...form, variants: form.variants.filter((_, i) => i !== index) });
-//   };
-
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//     if (!form.name || !form.price) return alert('Please fill out name and price.');
-
-//     const imagePlaceholder =
-//       form.image.trim() !== ''
-//         ? form.image
-//         : 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=500';
-
-//     addProduct({
-//       ...form,
-//       price: Number(form.price),
-//       image: imagePlaceholder,
-//       description:
-//         form.description.trim() !== ''
-//           ? form.description
-//           : 'This is a standard frontend design description mock view.',
-//       variants: form.variants, // array of { label, options }
-//     });
-
-//     setForm({ name: '', price: '', category: 'Car', description: '', image: '', variants: [] });
-//     setNewVariantLabel('');
-//     setNewVariantOptions('');
-//   };
-
-//   return (
-//     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-//       <div className="space-y-6">
-
-//         {/* MERCHANT QR CONFIGURATION CARD */}
-//         <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-//           <div className="flex items-center space-x-2 border-b border-gray-100 pb-2.5 mb-4">
-//             <QrCode className="h-4 w-4 text-indigo-600" />
-//             <h3 className="text-sm font-bold text-gray-900">Merchant Gateway Config</h3>
-//           </div>
-//           <div className="text-xs space-y-3">
-//             <p className="text-gray-400">Upload your store's global KHQR scan reference code:</p>
-//             <div className="flex items-center gap-4">
-//               <img src={khqrImage} alt="Active Gateway" className="w-16 h-16 object-contain border border-gray-200 rounded-lg bg-gray-50" />
-//               <label className="flex-1 flex flex-col items-center justify-center h-16 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition">
-//                 <Upload className="w-4 h-4 text-gray-400 mb-0.5" />
-//                 <span className="text-[10px] text-gray-500 font-medium">Update Checkout QR</span>
-//                 <input type="file" accept="image/*" onChange={handleQrUpload} className="hidden" />
-//               </label>
-//             </div>
-//           </div>
-//         </div>
-
-//         {/* ADD PRODUCT FORM */}
-//         <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-//           <h3 className="text-sm font-bold text-gray-900 border-b border-gray-100 pb-2.5 mb-4">Add Entry Form</h3>
-//           <form onSubmit={handleSubmit} className="space-y-3.5 text-xs">
-
-//             <div>
-//               <label className="block font-bold text-gray-400 uppercase mb-1">Product Designation</label>
-//               <input
-//                 type="text"
-//                 placeholder="Designation"
-//                 value={form.name}
-//                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-//                 className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-indigo-500 bg-gray-50/50"
-//               />
-//             </div>
-
-//             <div className="grid grid-cols-2 gap-3">
-//               <div>
-//                 <label className="block font-bold text-gray-400 uppercase mb-1">Price ($)</label>
-//                 <input
-//                   type="number"
-//                   step="0.01"
-//                   placeholder="Valuation"
-//                   value={form.price}
-//                   onChange={(e) => setForm({ ...form, price: e.target.value })}
-//                   className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-indigo-500 bg-gray-50/50"
-//                 />
-//               </div>
-//               <div>
-//                 <label className="block font-bold text-gray-400 uppercase mb-1">Category Group</label>
-//                 <select
-//                   value={form.category}
-//                   onChange={(e) => setForm({ ...form, category: e.target.value })}
-//                   className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-indigo-500 bg-gray-50/50 h-[34px]"
-//                 >
-//                   <option value="Car">Car</option>
-//                   <option value="Computer">Computer</option>
-//                   <option value="Fruit">Fruit</option>
-//                   <option value="Vegetable">Vegetable</option>
-//                   <option value="Clothes">Clothes</option>
-//                   <option value="Phone">Phone</option>
-//                   <option value="Accessories">Accessories</option>
-//                   <option value="Hotel Book">Hotel Book</option>
-//                   <option value="Meet">Meet</option>
-//                 </select>
-//               </div>
-//             </div>
-
-//             <div>
-//               <label className="block font-bold text-gray-400 uppercase mb-1">Product Detail Description</label>
-//               <textarea
-//                 rows="3"
-//                 placeholder="Type item features, conditions, or point descriptions here..."
-//                 value={form.description}
-//                 onChange={(e) => setForm({ ...form, description: e.target.value })}
-//                 className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-indigo-500 bg-gray-50/50 resize-none leading-normal"
-//               />
-//             </div>
-
-//             {/* ── VARIANTS BUILDER ── */}
-//             <div className="border border-gray-200 rounded-xl p-3 bg-gray-50/40 space-y-2.5">
-//               <div className="flex items-center space-x-1.5 mb-1">
-//                 <Tag className="h-3.5 w-3.5 text-indigo-500" />
-//                 <label className="block font-bold text-gray-500 uppercase">Product Options / Variants</label>
-//               </div>
-
-//               {/* Existing variants */}
-//               {form.variants.length > 0 && (
-//                 <div className="space-y-1.5">
-//                   {form.variants.map((v, i) => (
-//                     <div key={i} className="flex items-start justify-between bg-white border border-gray-200 rounded-lg px-3 py-2">
-//                       <div>
-//                         <span className="font-bold text-gray-700">{v.label}: </span>
-//                         <div className="flex flex-wrap gap-1 mt-1">
-//                           {v.options.map((opt, j) => (
-//                             <span key={j} className="bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-0.5 rounded-md text-[10px] font-semibold">
-//                               {opt}
-//                             </span>
-//                           ))}
-//                         </div>
-//                       </div>
-//                       <button type="button" onClick={() => removeVariant(i)} className="text-gray-300 hover:text-red-400 transition ml-2 mt-0.5 flex-shrink-0">
-//                         <X className="h-3.5 w-3.5" />
-//                       </button>
-//                     </div>
-//                   ))}
-//                 </div>
-//               )}
-
-//               {/* Add new variant row */}
-//               <div className="space-y-1.5">
-//                 <input
-//                   type="text"
-//                   placeholder='Option name — e.g. "Size" or "Color"'
-//                   value={newVariantLabel}
-//                   onChange={(e) => setNewVariantLabel(e.target.value)}
-//                   className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-indigo-400 bg-white text-[11px]"
-//                 />
-//                 <input
-//                   type="text"
-//                   placeholder='Values separated by comma — e.g. "S, M, L, XL"'
-//                   value={newVariantOptions}
-//                   onChange={(e) => setNewVariantOptions(e.target.value)}
-//                   onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addVariant(); } }}
-//                   className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-indigo-400 bg-white text-[11px]"
-//                 />
-//                 <button
-//                   type="button"
-//                   onClick={addVariant}
-//                   className="flex items-center space-x-1 text-indigo-600 hover:text-indigo-800 font-bold transition text-[11px]"
-//                 >
-//                   <PlusCircle className="h-3.5 w-3.5" />
-//                   <span>Add Option Group</span>
-//                 </button>
-//               </div>
-//             </div>
-
-//             <div>
-//               <label className="block font-bold text-gray-400 uppercase mb-1">Upload Product Image</label>
-//               <div className="flex items-center justify-center w-full">
-//                 <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-gray-200 border-dashed rounded-xl cursor-pointer bg-gray-50/50 hover:bg-gray-50 transition">
-//                   <div className="flex flex-col items-center justify-center pt-2 pb-2">
-//                     <Upload className="w-5 h-5 text-gray-400 mb-1" />
-//                     <p className="text-[10px] text-gray-500 font-medium">Click to upload from computer</p>
-//                   </div>
-//                   <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-//                 </label>
-//               </div>
-//               {form.image && <p className="text-[10px] text-green-600 mt-1 font-semibold">✓ Image loaded!</p>}
-//             </div>
-
-//             <button type="submit" className="w-full bg-blue-800 hover:bg-green-600 text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center space-x-1.5 transition mt-2">
-//               <Plus className="h-4 w-4" />
-//               <span>Append Item</span>
-//             </button>
-//           </form>
-//         </div>
-//       </div>
-
-//       {/* CATALOG MANIFEST TABLE */}
-//       <div className="lg:col-span-2 bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
-//         <div className="px-5 py-3 border-b border-gray-100 bg-gray-50/30">
-//           <h3 className="font-bold text-gray-800 text-xs">Catalog Manifest Array</h3>
-//         </div>
-//         <div className="overflow-x-auto text-xs">
-//           <table className="w-full text-left border-collapse">
-//             <thead>
-//               <tr className="bg-gray-50 text-gray-400 font-semibold border-b border-gray-100 uppercase tracking-wider text-[10px]">
-//                 <th className="px-5 py-2.5">Item Context</th>
-//                 <th className="px-5 py-2.5">Category</th>
-//                 <th className="px-5 py-2.5">Options</th>
-//                 <th className="px-5 py-2.5">Pricing</th>
-//                 <th className="px-5 py-2.5 text-right">Erase</th>
-//               </tr>
-//             </thead>
-//             <tbody className="divide-y divide-gray-100 text-gray-600 font-medium">
-//               {products.map((product) => (
-//                 <tr key={product.id} className="hover:bg-gray-50/40">
-//                   <td className="px-5 py-2 flex items-center space-x-2">
-//                     <img src={product.image} alt="" className="w-8 h-8 object-cover rounded-lg bg-gray-100" />
-//                     <div>
-//                       <span className="font-bold text-gray-900 line-clamp-1">{product.name}</span>
-//                       <p className="text-[10px] text-gray-400 font-normal line-clamp-1 max-w-[150px]">{product.description}</p>
-//                     </div>
-//                   </td>
-//                   <td className="px-5 py-2">
-//                     <span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md text-[10px] font-semibold whitespace-nowrap">{product.category}</span>
-//                   </td>
-//                   <td className="px-5 py-2">
-//                     {product.variants && product.variants.length > 0 ? (
-//                       <div className="flex flex-wrap gap-1">
-//                         {product.variants.map((v, i) => (
-//                           <span key={i} className="bg-indigo-50 text-indigo-600 border border-indigo-100 px-1.5 py-0.5 rounded text-[9px] font-bold whitespace-nowrap">
-//                             {v.label}
-//                           </span>
-//                         ))}
-//                       </div>
-//                     ) : (
-//                       <span className="text-gray-300 text-[10px]">—</span>
-//                     )}
-//                   </td>
-//                   <td className="px-5 py-2 font-semibold text-gray-900">${Number(product.price || 0).toFixed(2)}</td>
-//                   <td className="px-5 py-2 text-right">
-//                     <button onClick={() => deleteProduct(product.id)} className="text-gray-400 hover:text-red-500 p-1 rounded-lg transition">
-//                       <Trash2 className="h-4 w-4" />
-//                     </button>
-//                   </td>
-//                 </tr>
-//               ))}
-//             </tbody>
-//           </table>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-
-
-
-
-
-
-
-
-
 
 import React, { useState, useContext, useRef } from 'react';
 import { ShopContext } from '../../context/ShopContext';
@@ -355,7 +44,7 @@ function MultiImageUploader({ images, onChange, label = 'Product Images' }) {
   return (
     <div>
       <label className="block text-[10px] font-bold uppercase tracking-widest mb-2"
-        style={{ color:'rgba(232,232,240,0.35)' }}>{label}</label>
+        style={{ color:'rgba(16, 16, 201, 0.35)' }}>{label}</label>
       <div className="flex flex-wrap gap-2">
         {images.map((src, i) => (
           <div key={i} className="relative group w-16 h-16 rounded-xl overflow-hidden flex-shrink-0"
@@ -363,12 +52,12 @@ function MultiImageUploader({ images, onChange, label = 'Product Images' }) {
             <img src={src} alt="" className="w-full h-full object-cover" />
             <button type="button"
               onClick={() => onChange(images.filter((_,j) => j !== i))}
-              className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+              className="absolute inset-0 bg-blue-900 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
               <X className="h-4 w-4 text-red-400" />
             </button>
             {i === 0 && (
               <span className="absolute bottom-0 left-0 right-0 text-center text-[8px] font-black py-0.5"
-                style={{ background:'rgba(99,216,180,0.8)', color:'#080810' }}>MAIN</span>
+                style={{ background:'rgba(99,216,180,0.8)', color:'#1b1b96' }}>MAIN</span>
             )}
           </div>
         ))}
@@ -403,7 +92,7 @@ function VariantPricingGrid({ variants, variantPricing, onChange, basePrice }) {
       </p>
       <div className="rounded-xl overflow-hidden" style={{ border:'1px solid rgba(255,255,255,0.08)' }}>
         <div className="flex gap-2 text-[10px] font-bold uppercase tracking-widest py-2 px-3"
-          style={{ background:'rgba(255,255,255,0.04)', color:'rgba(200,200,220,0.4)' }}>
+          style={{ background:'rgba(12, 38, 158, 0.04)', color:'rgba(200,200,220,0.4)' }}>
           <span className="flex-1">Combination</span>
           <span className="w-24">Price ($)</span>
           <span className="w-20">Stock</span>
@@ -463,9 +152,9 @@ function ModelForm({ model, onChange, onRemove, isParent, index }) {
     onChange({ ...model, variantPricing: { ...(model.variantPricing||{}), [key]: { ...(model.variantPricing?.[key]||{}), [field]:value } } });
   };
 
-  const borderColor = isParent ? 'rgba(99,216,180,0.25)' : 'rgba(167,139,250,0.2)';
-  const accentColor = isParent ? '#63d8b4' : '#a78bfa';
-  const bgColor     = isParent ? 'rgba(99,216,180,0.03)' : 'rgba(167,139,250,0.03)';
+  const borderColor = isParent ? 'rgba(89, 90, 139, 0.97)' : 'rgb(3, 69, 190)';
+  const accentColor = isParent ? '#10972d' : '#0bc704';
+  const bgColor     = isParent ? 'rgba(6, 26, 139, 0.84)' : 'rgba(6, 22, 163, 0.9)';
 
   return (
     <div className="rounded-2xl p-5 space-y-5"
@@ -499,7 +188,7 @@ function ModelForm({ model, onChange, onRemove, isParent, index }) {
             value={model.name}
             onChange={e => onChange({ ...model, name: e.target.value })}
             className="w-full px-3 py-2.5 rounded-xl text-sm font-medium focus:outline-none"
-            style={{ background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', color:'#e8e8f0' }} />
+            style={{ background:'rgba(255, 255, 255, 0.05)', border:'1px solid rgba(255,255,255,0.1)', color:'#e8e8f0' }} />
         </div>
         <div>
           <label className="block text-[10px] font-bold uppercase tracking-widest mb-1.5"
@@ -554,7 +243,7 @@ function ModelForm({ model, onChange, onRemove, isParent, index }) {
               <div key={i} className="flex items-center gap-2 px-3 py-1.5 rounded-xl"
                 style={{ background:`${accentColor}12`, border:`1px solid ${accentColor}30` }}>
                 <span className="text-[11px] font-bold" style={{ color: accentColor }}>{v.label}:</span>
-                <span className="text-[10px]" style={{ color:'rgba(232,232,240,0.6)' }}>{v.options.join(', ')}</span>
+                <span className="text-[10px]" style={{ color:'rgba(4, 21, 172, 0.6)' }}>{v.options.join(', ')}</span>
                 <button type="button" onClick={() => removeVariant(i)} className="opacity-30 hover:opacity-100 transition">
                   <X className="h-3 w-3" />
                 </button>
@@ -684,30 +373,27 @@ export default function ManageProducts() {
   const lowStock      = products.filter(p => p.stock !== null && p.stock !== undefined && Number(p.stock) <= 5).length;
 
   // ── styles helpers
-  const inputStyle = { background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', color:'#e8e8f0' };
-  const cardStyle  = { background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.07)' };
+  const inputStyle = { background:'rgb(64, 74, 105)', border:'1px solid rgba(42, 52, 110, 0.84)', color:'#e8e8f0' };
+  const cardStyle  = { background:'rgb(14, 48, 161)', border:'1px solid rgba(53, 59, 66, 0.07)' };
 
   return (
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap');
-        .mp-root { font-family:'DM Sans',sans-serif; background:#080810; color:#e8e8f0; min-height:100vh; }
+        .mp-root { font-family:'DM Sans',sans-serif;background:slate; color:#e8e8f0; min-height:100vh; }
         .mp-head { font-family:'Syne',sans-serif; }
-        .row-hover:hover { background:rgba(99,216,180,0.025) !important; }
+        .row-hover:hover { background:rgb(50, 91, 153) !important; }
         input,textarea,select { font-family:'DM Sans',sans-serif; }
         input[type=number]::-webkit-inner-spin-button { opacity:.35; }
         ::-webkit-scrollbar { width:4px; height:4px; }
-        ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:99px; }
+        ::-webkit-scrollbar-thumb { background:rgb(11, 50, 179); border-radius:99px; }
       `}</style>
 
-      <div className="mp-root p-6 lg:p-8">
+      <div className="mp-root p-6 lg:p-8 ">
 
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="mp-head font-extrabold text-3xl">Catalog Manager</h1>
-          <p className="text-sm mt-1" style={{ color:'rgba(232,232,240,0.4)' }}>
-            Parent products · child models · per-variant pricing · multi-image gallery
-          </p>
+        <div className="mb-8 ">
+          <h1 className="text-3xl text-start uppercase  font-extrabold tracking-normal text-3xl text-blue-800">Manage Porducts</h1>
         </div>
 
         {/* Stats */}
@@ -724,7 +410,7 @@ export default function ManageProducts() {
                 <Icon className="h-4 w-4" style={{ color }} />
               </div>
               <div>
-                <p className="mp-head font-bold text-xl">{value}</p>
+                <p className=" font-bold text-xl">{value}</p>
                 <p className="text-[11px] font-medium" style={{ color:'rgba(232,232,240,0.4)' }}>{label}</p>
               </div>
             </div>
@@ -733,12 +419,12 @@ export default function ManageProducts() {
 
         {/* Tabs */}
         <div className="flex gap-1 mb-6 p-1 rounded-xl w-fit"
-          style={{ background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.07)' }}>
+          style={{ background:'rgb(7, 76, 167)', border:'1px solid rgba(13, 64, 175, 0.57)' }}>
           {[['products','Catalog'], ['add','Add Product'], ['qr','Payment QR']].map(([t,label]) => (
             <button key={t} onClick={() => setActiveTab(t)}
               className="px-5 py-2 rounded-lg text-xs font-bold transition-all"
               style={activeTab===t
-                ? { background:'rgba(99,216,180,0.15)', color:'#63d8b4', border:'1px solid rgba(99,216,180,0.3)' }
+                ? { background:'rgba(2, 96, 173, 0.4)', color:'#63d8b4', border:'1px solid rgba(99,216,180,0.3)' }
                 : { color:'rgba(232,232,240,0.4)' }}>
               {label}
             </button>
@@ -751,7 +437,7 @@ export default function ManageProducts() {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr style={{ borderBottom:'1px solid rgba(255,255,255,0.07)' }}>
+                  <tr style={{ borderBottom:'1px solid rgba(153, 146, 146, 0.91)' }}>
                     {['Product','Category','Price','Stock','Models','Variants',''].map(h => (
                       <th key={h} className="px-5 py-3.5 text-[10px] font-bold uppercase tracking-widest"
                         style={{ color:'rgba(232,232,240,0.3)' }}>{h}</th>
@@ -761,23 +447,23 @@ export default function ManageProducts() {
                 <tbody>
                   {products.map((p, i) => {
                     const isExpanded = expandedProduct === p.id;
-                    const stockColor = p.stock == null ? 'rgba(232,232,240,0.25)'
+                    const stockColor = p.stock == null ? 'rgba(232, 232, 240, 0.47)'
                       : p.stock <= 0  ? '#f87171'
                       : p.stock <= 5  ? '#fbbf24' : '#34d399';
                     return (
                       <React.Fragment key={p.id}>
                         <tr className="row-hover transition cursor-pointer"
                           onClick={() => setExpandedProduct(isExpanded ? null : p.id)}
-                          style={{ borderBottom:'1px solid rgba(255,255,255,0.05)' }}>
+                          style={{ borderBottom:'1px solid rgba(255, 255, 255, 0.85)' }}>
                           <td className="px-5 py-3.5">
                             <div className="flex items-center gap-3">
                               <div className="relative flex-shrink-0">
                                 <img src={p.image} alt=""
                                   className="w-10 h-10 object-cover rounded-xl"
-                                  style={{ border:'1px solid rgba(255,255,255,0.08)' }} />
+                                  style={{ border:'1px solid rgba(255, 255, 255, 0.87)' }} />
                                 {p.images?.length > 1 && (
                                   <span className="absolute -bottom-1 -right-1 text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center"
-                                    style={{ background:'rgba(99,216,180,0.9)', color:'#080810' }}>
+                                    style={{ background:'rgba(99,216,180,0.9)', color:'#0606a8' }}>
                                     {p.images.length}
                                   </span>
                                 )}
@@ -808,7 +494,7 @@ export default function ManageProducts() {
                           <td className="px-5 py-3.5">
                             {p.childModels?.length
                               ? <span className="text-[10px] font-bold px-2 py-0.5 rounded-md"
-                                  style={{ background:'rgba(167,139,250,0.1)', color:'#a78bfa', border:'1px solid rgba(167,139,250,0.2)' }}>
+                                  style={{ background:'rgba(20, 41, 160, 0.1)', color:'#a78bfa', border:'1px solid rgba(167,139,250,0.2)' }}>
                                   +{p.childModels.length} model{p.childModels.length>1?'s':''}
                                 </span>
                               : <span style={{ color:'rgba(232,232,240,0.2)' }}>—</span>}
@@ -839,9 +525,9 @@ export default function ManageProducts() {
 
                         {/* Expanded detail */}
                         {isExpanded && (
-                          <tr style={{ borderBottom:'1px solid rgba(255,255,255,0.05)' }}>
+                          <tr style={{ borderBottom:'1px solid rgb(5, 56, 151)' }}>
                             <td colSpan={7} className="px-5 py-5"
-                              style={{ background:'rgba(99,216,180,0.015)' }}>
+                              style={{ background:'rgb(19, 59, 146)' }}>
 
                               {/* image strip */}
                               {p.images?.length > 1 && (
@@ -959,19 +645,19 @@ export default function ManageProducts() {
             <div className="rounded-2xl p-5 flex items-center gap-5" style={cardStyle}>
               <div className="flex-1">
                 <label className="block text-[10px] font-bold uppercase tracking-widest mb-2"
-                  style={{ color:'rgba(232,232,240,0.35)' }}>Product Category</label>
+                  style={{ color:'rgba(231, 238, 238, 0.98)' }}>Product Category</label>
                 <select value={category} onChange={e => setCategory(e.target.value)}
                   className="w-full px-4 py-3 rounded-xl text-sm font-bold focus:outline-none"
                   style={inputStyle}>
-                  {CATEGORIES.map(c => <option key={c} value={c} style={{ background:'#0d0d1a' }}>{c}</option>)}
+                  {CATEGORIES.map(c => <option key={c} value={c} style={{ background:'#0c26b6' }}>{c}</option>)}
                 </select>
               </div>
               <div className="text-right hidden sm:block">
-                <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color:'rgba(232,232,240,0.2)' }}>Structure</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color:'rgba(124, 128, 139, 0.94)' }}>Structure</p>
                 <div className="flex items-center gap-2 text-xs font-semibold" style={{ color:'rgba(232,232,240,0.45)' }}>
-                  <span className="px-2 py-1 rounded-md" style={{ background:'rgba(99,216,180,0.1)', color:'#63d8b4' }}>Parent</span>
+                  <span className="px-2 py-1 rounded-md" style={{ background:'rgb(7, 92, 172)', color:'#0a9774' }}>Parent</span>
                   <span>+</span>
-                  <span className="px-2 py-1 rounded-md" style={{ background:'rgba(167,139,250,0.1)', color:'#a78bfa' }}>
+                  <span className="px-2 py-1 rounded-md" style={{ background:'rgb(14, 66, 179)', color:'#c4c2cf' }}>
                     {children.length} child{children.length!==1?'s':''}
                   </span>
                 </div>
@@ -981,11 +667,11 @@ export default function ManageProducts() {
             {/* ── PARENT MODEL ── */}
             <div>
               <div className="flex items-center gap-2 mb-3 px-1">
-                <div className="h-px flex-1" style={{ background:'rgba(99,216,180,0.15)' }} />
-                <span className="text-[10px] font-black uppercase tracking-widest" style={{ color:'rgba(99,216,180,0.5)' }}>
+                <div className="h-px flex-1" style={{ background:'rgba(0, 74, 212, 0.65)' }} />
+                <span className="text-[10px] font-black uppercase tracking-widest" style={{ color:'rgba(2, 22, 201, 0.5)' }}>
                   Parent / Base Product
                 </span>
-                <div className="h-px flex-1" style={{ background:'rgba(99,216,180,0.15)' }} />
+                <div className="h-px flex-1" style={{ background:'rgba(7, 25, 122, 0.59)' }} />
               </div>
               <ModelForm model={parent} onChange={setParent} isParent={true} />
             </div>
@@ -994,11 +680,11 @@ export default function ManageProducts() {
             {children.length > 0 && (
               <div>
                 <div className="flex items-center gap-2 mb-3 px-1">
-                  <div className="h-px flex-1" style={{ background:'rgba(167,139,250,0.15)' }} />
-                  <span className="text-[10px] font-black uppercase tracking-widest" style={{ color:'rgba(167,139,250,0.5)' }}>
+                  <div className="h-px flex-1" style={{ background:'rgb(5, 40, 138)' }} />
+                  <span className="text-[10px] font-black uppercase tracking-widest" style={{ color:'rgba(6, 24, 131, 0.99)' }}>
                     Child Models ({children.length})
                   </span>
-                  <div className="h-px flex-1" style={{ background:'rgba(167,139,250,0.15)' }} />
+                  <div className="h-px flex-1" style={{ background:'rgb(10, 43, 151)' }} />
                 </div>
                 <div className="space-y-4">
                   {children.map((child, i) => (
@@ -1014,7 +700,7 @@ export default function ManageProducts() {
             {/* Add child button */}
             <button type="button" onClick={addChild}
               className="w-full py-3.5 rounded-2xl text-sm font-bold flex items-center justify-center gap-2.5 transition"
-              style={{ background:'rgba(167,139,250,0.07)', border:'1.5px dashed rgba(167,139,250,0.3)', color:'#a78bfa' }}>
+              style={{ background:'rgb(29, 65, 228)', border:'1.5px dashed rgba(167,139,250,0.3)', color:'#a78bfa' }}>
               <GitBranch className="h-4 w-4" />
               Add Child Model (e.g. Pro Max, 512GB edition…)
             </button>
@@ -1031,8 +717,8 @@ export default function ManageProducts() {
 
         {/* ══ TAB: PAYMENT QR ═══════════════════════════════════════════════════ */}
         {activeTab === 'qr' && (
-          <div className="max-w-sm space-y-6">
-            <div className="rounded-2xl p-6 space-y-5" style={cardStyle}>
+          <div className="max-w-sm space-y-6 bg-slate-900 rounded-2xl">
+            <div className="rounded-2xl  p-6 space-y-5" style={cardStyle}>
               <div className="flex items-center gap-2">
                 <QrCode className="h-4 w-4" style={{ color:'#63d8b4' }} />
                 <h3 className="mp-head font-bold text-sm">KHQR Payment Gateway</h3>
@@ -1043,9 +729,9 @@ export default function ManageProducts() {
               <div className="flex items-center gap-5">
                 <img src={khqrImage} alt="KHQR"
                   className="w-24 h-24 object-contain rounded-2xl"
-                  style={{ border:'1px solid rgba(255,255,255,0.08)', background:'white', padding:'6px' }} />
+                  style={{ border:'1px solid rgba(10, 86, 187, 0.97)', background:'white', padding:'6px' }} />
                 <label className="flex-1 flex flex-col items-center justify-center h-24 rounded-2xl cursor-pointer transition"
-                  style={{ border:'2px dashed rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.02)' }}>
+                  style={{ border:'2px dashed rgb(7, 65, 192)', background:'rgba(17, 54, 177, 0.23)' }}>
                   <Upload className="h-5 w-5 mb-1.5 opacity-30" />
                   <span className="text-[11px] font-semibold opacity-30">Upload new KHQR</span>
                   <input type="file" accept="image/*" onChange={handleQrUpload} className="hidden" />
