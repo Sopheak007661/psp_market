@@ -1947,37 +1947,211 @@ function PreLoginProductCard({ product, onProductClick }) {
   );
 }
 
-// ─────────────────────────────────────────────
-// USER COMMENT SECTION
-// ─────────────────────────────────────────────
+// // ─────────────────────────────────────────────
+// // USER COMMENT SECTION
+// // ─────────────────────────────────────────────
+// function UserCommentSection() {
+//   const [comments, setComments] = useState(() => {
+//     try { return JSON.parse(localStorage.getItem('psp_comments') || '[]'); } catch { return []; }
+//   });
+//   const [username, setUsername] = useState('');
+//   const [comment,  setComment]  = useState('');
+//   const [rating,   setRating]   = useState(5);
+//   const [hovered,  setHovered]  = useState(0);
+//   const [err,      setErr]      = useState('');
+//   const [success,  setSuccess]  = useState(false);
+
+//   const AVATAR_COLORS = ['bg-blue-500','bg-emerald-500','bg-violet-500','bg-pink-500','bg-amber-500','bg-cyan-500','bg-red-500'];
+//   const getAvatarColor = (name) => AVATAR_COLORS[name.charCodeAt(0) % AVATAR_COLORS.length];
+//   const RATING_LABELS = ['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent'];
+
+//   const handleSubmit = (e) => {
+//     e.preventDefault();
+//     if (!username.trim())          { setErr('Please enter your name.'); return; }
+//     if (!comment.trim())           { setErr('Please write a comment.'); return; }
+//     if (comment.trim().length < 5) { setErr('Comment is too short (minimum 5 characters).'); return; }
+//     const newComment = {
+//       id: Date.now(), username: username.trim(), comment: comment.trim(), rating,
+//       date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+//     };
+//     const updated = [newComment, ...comments];
+//     setComments(updated);
+//     try { localStorage.setItem('psp_comments', JSON.stringify(updated)); } catch {}
+//     setUsername(''); setComment(''); setRating(5); setErr(''); setSuccess(true);
+//     setTimeout(() => setSuccess(false), 3500);
+//   };
+
+//   const totalReviews = comments.length;
+
+//   return (
+//     <div className="max-w-7xl mx-auto px-6 py-10">
+//       <div className="flex items-center gap-3 mb-2">
+//         <h3 className="text-lg font-bold text-slate-800">Customer Reviews</h3>
+//         <span className="text-xs text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full font-medium">{totalReviews} reviews</span>
+//       </div>
+//       <div className="bg-blue-700 border border-blue-100 rounded-2xl p-5 mb-8">
+//         <h4 className="font-semibold text-slate-900 text-sm mb-4 flex items-center gap-2"><UserPlus size={15} className="text-white" /> Enter your review</h4>
+//         {success && <div className="flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 text-xs font-semibold px-3 py-2.5 rounded-xl mb-3"><CheckCircle size={13} /> Thanks for your review! It's now live below.</div>}
+//         {err && <div className="bg-red-50 border border-red-100 text-red-600 text-xs px-3 py-2.5 rounded-xl mb-3">{err}</div>}
+//         <form onSubmit={handleSubmit} className="space-y-3">
+//           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+//             <div>
+//               <label className="block text-[10px] font-bold text-slate-900 uppercase tracking-wider mb-1">Your name *</label>
+//               <div className="relative">
+//                 <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><User size={13} /></span>
+//                 <input type="text" placeholder="e.g. Sokha, John…" value={username} onChange={e => { setUsername(e.target.value); setErr(''); }} maxLength={40}
+//                   className="w-full pl-8 pr-4 py-2.5 border border-slate-200 rounded-xl text-slate-800 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition" />
+//               </div>
+//             </div>
+//             <div>
+//               <label className="block text-[10px] font-bold text-slate-900 uppercase tracking-wider mb-1">Rating *</label>
+//               <div className="flex items-center gap-1 h-[42px]">
+//                 {[1,2,3,4,5].map(star => (
+//                   <button key={star} type="button" onMouseEnter={() => setHovered(star)} onMouseLeave={() => setHovered(0)} onClick={() => setRating(star)} className="text-2xl transition-transform hover:scale-110 focus:outline-none leading-none">
+//                     <span className={(hovered || rating) >= star ? 'text-slate-900' : 'text-slate-300'}>★</span>
+//                   </button>
+//                 ))}
+//                 <span className="text-xs text-white ml-1">{RATING_LABELS[hovered || rating]}</span>
+//               </div>
+//             </div>
+//           </div>
+//           <div>
+//             <label className="block text-[10px] font-bold text-slate-900 uppercase tracking-wider mb-1">Your comment *</label>
+//             <textarea rows={3} placeholder="Tell others about your experience with PSP MARKET…" value={comment} onChange={e => { setComment(e.target.value); setErr(''); }} maxLength={300}
+//               className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-slate-800 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition resize-none" />
+//             <p className="text-[10px] text-slate-400 text-right mt-0.5">{comment.length}/300</p>
+//           </div>
+//           <button type="submit" className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition shadow-sm">Post</button>
+//         </form>
+//       </div>
+//       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+//         {comments.map(c => (
+//           <div key={c.id} className="bg-white border border-slate-400 rounded-2xl p-5 shadow-sm relative">
+//             <span className="absolute top-3 right-3 text-[9px] bg-blue-50 text-blue-600 border border-blue-100 px-2 py-0.5 rounded-full font-semibold">Customer</span>
+//             <div className="flex items-center gap-3 mb-3">
+//               <div className={`w-8 h-8 rounded-full ${getAvatarColor(c.username)} flex items-center justify-center text-xs font-bold text-white flex-shrink-0`}>{c.username[0].toUpperCase()}</div>
+//               <div className="flex-1 min-w-0">
+//                 <span className="text-sm font-semibold text-slate-700 block truncate">{c.username}</span>
+//                 <p className="text-[10px] text-slate-400">{c.date}</p>
+//               </div>
+//               <span className="text-slate-900 text-xs mt-5 flex-shrink-0">{'★'.repeat(c.rating)}</span>
+//             </div>
+//             <p className="text-xs text-slate-500 leading-relaxed">"{c.comment}"</p>
+//           </div>
+//         ))}
+//       </div>
+//       {comments.length === 0 && <p className="text-center text-xs text-slate-400 mt-4">Be the first to leave a review above!</p>}
+//     </div>
+//   );
+// }
+
+
+
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// REPLACE the existing UserCommentSection function in App.jsx with this one.
+// Everything else in App.jsx stays exactly the same.
+//
+// Changes vs original:
+//   • On mount  — fetches comments from GET  /api/comments  (falls back to localStorage)
+//   • On submit — POSTs new comment to       POST /api/comments, then refreshes list
+//   • localStorage is still kept as offline/fallback mirror
+// ─────────────────────────────────────────────────────────────────────────────
+
 function UserCommentSection() {
-  const [comments, setComments] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('psp_comments') || '[]'); } catch { return []; }
-  });
-  const [username, setUsername] = useState('');
-  const [comment,  setComment]  = useState('');
-  const [rating,   setRating]   = useState(5);
-  const [hovered,  setHovered]  = useState(0);
-  const [err,      setErr]      = useState('');
-  const [success,  setSuccess]  = useState(false);
+  const [comments,  setComments]  = useState([]);
+  const [username,  setUsername]  = useState('');
+  const [comment,   setComment]   = useState('');
+  const [rating,    setRating]    = useState(5);
+  const [hovered,   setHovered]   = useState(0);
+  const [err,       setErr]       = useState('');
+  const [success,   setSuccess]   = useState(false);
+  const [submitting,setSubmitting]= useState(false);
+  const [loading,   setLoading]   = useState(true);
 
-  const AVATAR_COLORS = ['bg-blue-500','bg-emerald-500','bg-violet-500','bg-pink-500','bg-amber-500','bg-cyan-500','bg-red-500'];
+  const AVATAR_COLORS  = ['bg-blue-500','bg-emerald-500','bg-violet-500','bg-pink-500','bg-amber-500','bg-cyan-500','bg-red-500'];
   const getAvatarColor = (name) => AVATAR_COLORS[name.charCodeAt(0) % AVATAR_COLORS.length];
-  const RATING_LABELS = ['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent'];
+  const RATING_LABELS  = ['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent'];
 
-  const handleSubmit = (e) => {
+  // ── Load comments from API (falls back to localStorage) ───────────────────
+  const loadComments = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/comments');
+      if (res.ok) {
+        const data = await res.json();
+        setComments(data);
+        // mirror to localStorage so admin dashboard still works offline
+        try { localStorage.setItem('psp_comments', JSON.stringify(data)); } catch {}
+      } else {
+        throw new Error('non-200');
+      }
+    } catch {
+      // fallback to localStorage
+      try {
+        const saved = localStorage.getItem('psp_comments');
+        setComments(saved ? JSON.parse(saved) : []);
+      } catch {
+        setComments([]);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadComments();
+  }, []);
+
+  // ── Submit handler ────────────────────────────────────────────────────────
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!username.trim())          { setErr('Please enter your name.'); return; }
-    if (!comment.trim())           { setErr('Please write a comment.'); return; }
+    if (!username.trim())          { setErr('Please enter your name.');                        return; }
+    if (!comment.trim())           { setErr('Please write a comment.');                        return; }
     if (comment.trim().length < 5) { setErr('Comment is too short (minimum 5 characters).'); return; }
+
+    const dateLabel  = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     const newComment = {
-      id: Date.now(), username: username.trim(), comment: comment.trim(), rating,
-      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      id:       Date.now(),
+      username: username.trim(),
+      comment:  comment.trim(),
+      rating,
+      date:     dateLabel,
     };
-    const updated = [newComment, ...comments];
-    setComments(updated);
-    try { localStorage.setItem('psp_comments', JSON.stringify(updated)); } catch {}
-    setUsername(''); setComment(''); setRating(5); setErr(''); setSuccess(true);
+
+    setSubmitting(true);
+    setErr('');
+
+    try {
+      const res = await fetch('/api/comments', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(newComment),
+      });
+
+      if (res.ok) {
+        // Reload from DB so the list is authoritative
+        await loadComments();
+      } else {
+        // Graceful degradation — show it locally even if DB failed
+        const updated = [newComment, ...comments];
+        setComments(updated);
+        try { localStorage.setItem('psp_comments', JSON.stringify(updated)); } catch {}
+      }
+    } catch {
+      // Network failure — keep locally
+      const updated = [newComment, ...comments];
+      setComments(updated);
+      try { localStorage.setItem('psp_comments', JSON.stringify(updated)); } catch {}
+    } finally {
+      setSubmitting(false);
+    }
+
+    setUsername('');
+    setComment('');
+    setRating(5);
+    setSuccess(true);
     setTimeout(() => setSuccess(false), 3500);
   };
 
@@ -1985,29 +2159,68 @@ function UserCommentSection() {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
+      {/* ── Heading ── */}
       <div className="flex items-center gap-3 mb-2">
         <h3 className="text-lg font-bold text-slate-800">Customer Reviews</h3>
-        <span className="text-xs text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full font-medium">{totalReviews} reviews</span>
+        <span className="text-xs text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full font-medium">
+          {loading ? '…' : totalReviews} reviews
+        </span>
       </div>
+
+      {/* ── Review form ── */}
       <div className="bg-blue-700 border border-blue-100 rounded-2xl p-5 mb-8">
-        <h4 className="font-semibold text-slate-900 text-sm mb-4 flex items-center gap-2"><UserPlus size={15} className="text-white" /> Enter your review</h4>
-        {success && <div className="flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 text-xs font-semibold px-3 py-2.5 rounded-xl mb-3"><CheckCircle size={13} /> Thanks for your review! It's now live below.</div>}
-        {err && <div className="bg-red-50 border border-red-100 text-red-600 text-xs px-3 py-2.5 rounded-xl mb-3">{err}</div>}
+        <h4 className="font-semibold text-slate-900 text-sm mb-4 flex items-center gap-2">
+          <UserPlus size={15} className="text-white" /> Enter your review
+        </h4>
+
+        {success && (
+          <div className="flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 text-xs font-semibold px-3 py-2.5 rounded-xl mb-3">
+            <CheckCircle size={13} /> Thanks for your review! It's now live below.
+          </div>
+        )}
+        {err && (
+          <div className="bg-red-50 border border-red-100 text-red-600 text-xs px-3 py-2.5 rounded-xl mb-3">
+            {err}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {/* Name */}
             <div>
-              <label className="block text-[10px] font-bold text-slate-900 uppercase tracking-wider mb-1">Your name *</label>
+              <label className="block text-[10px] font-bold text-slate-900 uppercase tracking-wider mb-1">
+                Your name *
+              </label>
               <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><User size={13} /></span>
-                <input type="text" placeholder="e.g. Sokha, John…" value={username} onChange={e => { setUsername(e.target.value); setErr(''); }} maxLength={40}
-                  className="w-full pl-8 pr-4 py-2.5 border border-slate-200 rounded-xl text-slate-800 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition" />
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                  <User size={13} />
+                </span>
+                <input
+                  type="text"
+                  placeholder="e.g. Sokha, John…"
+                  value={username}
+                  onChange={e => { setUsername(e.target.value); setErr(''); }}
+                  maxLength={40}
+                  className="w-full pl-8 pr-4 py-2.5 border border-slate-200 rounded-xl text-slate-800 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
+                />
               </div>
             </div>
+
+            {/* Star rating */}
             <div>
-              <label className="block text-[10px] font-bold text-slate-900 uppercase tracking-wider mb-1">Rating *</label>
+              <label className="block text-[10px] font-bold text-slate-900 uppercase tracking-wider mb-1">
+                Rating *
+              </label>
               <div className="flex items-center gap-1 h-[42px]">
                 {[1,2,3,4,5].map(star => (
-                  <button key={star} type="button" onMouseEnter={() => setHovered(star)} onMouseLeave={() => setHovered(0)} onClick={() => setRating(star)} className="text-2xl transition-transform hover:scale-110 focus:outline-none leading-none">
+                  <button
+                    key={star}
+                    type="button"
+                    onMouseEnter={() => setHovered(star)}
+                    onMouseLeave={() => setHovered(0)}
+                    onClick={() => setRating(star)}
+                    className="text-2xl transition-transform hover:scale-110 focus:outline-none leading-none"
+                  >
                     <span className={(hovered || rating) >= star ? 'text-slate-900' : 'text-slate-300'}>★</span>
                   </button>
                 ))}
@@ -2015,35 +2228,78 @@ function UserCommentSection() {
               </div>
             </div>
           </div>
+
+          {/* Comment textarea */}
           <div>
-            <label className="block text-[10px] font-bold text-slate-900 uppercase tracking-wider mb-1">Your comment *</label>
-            <textarea rows={3} placeholder="Tell others about your experience with PSP MARKET…" value={comment} onChange={e => { setComment(e.target.value); setErr(''); }} maxLength={300}
-              className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-slate-800 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition resize-none" />
+            <label className="block text-[10px] font-bold text-slate-900 uppercase tracking-wider mb-1">
+              Your comment *
+            </label>
+            <textarea
+              rows={3}
+              placeholder="Tell others about your experience with PSP MARKET…"
+              value={comment}
+              onChange={e => { setComment(e.target.value); setErr(''); }}
+              maxLength={300}
+              className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-slate-800 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition resize-none"
+            />
             <p className="text-[10px] text-slate-400 text-right mt-0.5">{comment.length}/300</p>
           </div>
-          <button type="submit" className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition shadow-sm">Post</button>
+
+          <button
+            type="submit"
+            disabled={submitting}
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition shadow-sm"
+          >
+            {submitting
+              ? <RefreshCw size={13} className="animate-spin" />
+              : 'Post'
+            }
+          </button>
         </form>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {comments.map(c => (
-          <div key={c.id} className="bg-white border border-slate-400 rounded-2xl p-5 shadow-sm relative">
-            <span className="absolute top-3 right-3 text-[9px] bg-blue-50 text-blue-600 border border-blue-100 px-2 py-0.5 rounded-full font-semibold">Customer</span>
-            <div className="flex items-center gap-3 mb-3">
-              <div className={`w-8 h-8 rounded-full ${getAvatarColor(c.username)} flex items-center justify-center text-xs font-bold text-white flex-shrink-0`}>{c.username[0].toUpperCase()}</div>
-              <div className="flex-1 min-w-0">
-                <span className="text-sm font-semibold text-slate-700 block truncate">{c.username}</span>
-                <p className="text-[10px] text-slate-400">{c.date}</p>
+
+      {/* ── Comment cards ── */}
+      {loading ? (
+        <div className="flex items-center justify-center py-10 gap-3 text-slate-400">
+          <RefreshCw size={18} className="animate-spin" />
+          <span className="text-sm">Loading reviews…</span>
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {comments.map(c => (
+              <div key={c.id} className="bg-white border border-slate-400 rounded-2xl p-5 shadow-sm relative">
+                <span className="absolute top-3 right-3 text-[9px] bg-blue-50 text-blue-600 border border-blue-100 px-2 py-0.5 rounded-full font-semibold">
+                  Customer
+                </span>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className={`w-8 h-8 rounded-full ${getAvatarColor(c.username)} flex items-center justify-center text-xs font-bold text-white flex-shrink-0`}>
+                    {c.username[0].toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-sm font-semibold text-slate-700 block truncate">{c.username}</span>
+                    <p className="text-[10px] text-slate-400">{c.date}</p>
+                  </div>
+                  <span className="text-slate-900 text-xs mt-5 flex-shrink-0">{'★'.repeat(c.rating)}</span>
+                </div>
+                <p className="text-xs text-slate-500 leading-relaxed">"{c.comment}"</p>
               </div>
-              <span className="text-slate-900 text-xs mt-5 flex-shrink-0">{'★'.repeat(c.rating)}</span>
-            </div>
-            <p className="text-xs text-slate-500 leading-relaxed">"{c.comment}"</p>
+            ))}
           </div>
-        ))}
-      </div>
-      {comments.length === 0 && <p className="text-center text-xs text-slate-400 mt-4">Be the first to leave a review above!</p>}
+          {comments.length === 0 && (
+            <p className="text-center text-xs text-slate-400 mt-4">
+              Be the first to leave a review above!
+            </p>
+          )}
+        </>
+      )}
     </div>
   );
 }
+
+
+
+
 
 // ─────────────────────────────────────────────
 // LOGIN PAGE
@@ -2581,3 +2837,35 @@ export default function App() {
     </ShopProvider>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
