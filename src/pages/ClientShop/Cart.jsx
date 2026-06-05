@@ -346,210 +346,273 @@ export default function Cart({ userEmail, userRole }) {
   const subtotal   = cart.reduce((s, i) => s + i.price * i.quantity, 0);
   const grandTotal = subtotal + shippingFee;
 
-  const saveOrder = useCallback((invoice, history) => {
-    const existIdx = history.findIndex(
-      o => o.customerName.toLowerCase().trim() === invoice.customerName.toLowerCase().trim() &&
-           o.phone.trim() === invoice.phone.trim() &&
-           o.accountEmail === invoice.accountEmail
-    );
+  // const saveOrder = useCallback((invoice, history) => {
+  //   const existIdx = history.findIndex(
+  //     o => o.customerName.toLowerCase().trim() === invoice.customerName.toLowerCase().trim() &&
+  //          o.phone.trim() === invoice.phone.trim() &&
+  //          o.accountEmail === invoice.accountEmail
+  //   );
 
-    let updated;
-    if (existIdx !== -1) {
-      const merged = [...history[existIdx].items];
-      invoice.items.forEach(ni => {
-        const mi = merged.findIndex(i => i.id === ni.id);
-        mi !== -1 ? (merged[mi].quantity += ni.quantity) : merged.push({ ...ni });
-      });
-      const newSub = merged.reduce((s, i) => s + i.price * i.quantity, 0);
-      const final  = { ...history[existIdx], items: merged, subtotal: newSub, total: newSub + history[existIdx].shippingFee, date: invoice.date };
-      updated = [...history];
-      updated.splice(existIdx, 1);
-      updated.unshift(final);
-      localStorage.setItem('psp_market_order_history', JSON.stringify(updated));
-      setOrderHistory(updated);
-      return final;
-    } else {
-      updated = [invoice, ...history];
-      localStorage.setItem('psp_market_order_history', JSON.stringify(updated));
-      setOrderHistory(updated);
-      return invoice;
-    }
-  }, []);
+  //   let updated;
+  //   if (existIdx !== -1) {
+  //     const merged = [...history[existIdx].items];
+  //     invoice.items.forEach(ni => {
+  //       const mi = merged.findIndex(i => i.id === ni.id);
+  //       mi !== -1 ? (merged[mi].quantity += ni.quantity) : merged.push({ ...ni });
+  //     });
+  //     const newSub = merged.reduce((s, i) => s + i.price * i.quantity, 0);
+  //     const final  = { ...history[existIdx], items: merged, subtotal: newSub, total: newSub + history[existIdx].shippingFee, date: invoice.date };
+  //     updated = [...history];
+  //     updated.splice(existIdx, 1);
+  //     updated.unshift(final);
+  //     localStorage.setItem('psp_market_order_history', JSON.stringify(updated));
+  //     setOrderHistory(updated);
+  //     return final;
+  //   } else {
+  //     updated = [invoice, ...history];
+  //     localStorage.setItem('psp_market_order_history', JSON.stringify(updated));
+  //     setOrderHistory(updated);
+  //     return invoice;
+  //   }
+  // }, []);
 
-  const startTimer = useCallback(() => {
-    secondsRef.current = QR_EXPIRY_SECONDS;
-    setQrSecondsLeft(QR_EXPIRY_SECONDS);
-    clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => {
-      secondsRef.current -= 1;
-      setQrSecondsLeft(secondsRef.current);
-      if (secondsRef.current <= 0) {
-        clearInterval(timerRef.current);
-        clearInterval(pollRef.current);
-        setPayStatus(PAY_STATUS.EXPIRED);
-      }
-    }, 1000);
-  }, []);
+  // const startTimer = useCallback(() => {
+  //   secondsRef.current = QR_EXPIRY_SECONDS;
+  //   setQrSecondsLeft(QR_EXPIRY_SECONDS);
+  //   clearInterval(timerRef.current);
+  //   timerRef.current = setInterval(() => {
+  //     secondsRef.current -= 1;
+  //     setQrSecondsLeft(secondsRef.current);
+  //     if (secondsRef.current <= 0) {
+  //       clearInterval(timerRef.current);
+  //       clearInterval(pollRef.current);
+  //       setPayStatus(PAY_STATUS.EXPIRED);
+  //     }
+  //   }, 1000);
+  // }, []);
 
-  const startPolling = useCallback((invoiceId) => {
-    clearInterval(pollRef.current);
-    let lastId = lastTelegramUpdate;
-    pollRef.current = setInterval(async () => {
-      const result = await pollForConfirmation(invoiceId, lastId);
-      lastId = result.lastUpdateId;
-      setLastTelegramUpdate(result.lastUpdateId);
+  // const startPolling = useCallback((invoiceId) => {
+  //   clearInterval(pollRef.current);
+  //   let lastId = lastTelegramUpdate;
+  //   pollRef.current = setInterval(async () => {
+  //     const result = await pollForConfirmation(invoiceId, lastId);
+  //     lastId = result.lastUpdateId;
+  //     setLastTelegramUpdate(result.lastUpdateId);
 
-      if (result.status === 'confirmed') {
-        clearInterval(pollRef.current);
-        clearInterval(timerRef.current);
-        setPayStatus(PAY_STATUS.CONFIRMED);
-      } else if (result.status === 'cancelled') {
-        clearInterval(pollRef.current);
-        clearInterval(timerRef.current);
-        setPayStatus(PAY_STATUS.FAILED);
-      }
-    }, 4000);
-  }, [lastTelegramUpdate]);
+  //     if (result.status === 'confirmed') {
+  //       clearInterval(pollRef.current);
+  //       clearInterval(timerRef.current);
+  //       setPayStatus(PAY_STATUS.CONFIRMED);
+  //     } else if (result.status === 'cancelled') {
+  //       clearInterval(pollRef.current);
+  //       clearInterval(timerRef.current);
+  //       setPayStatus(PAY_STATUS.FAILED);
+  //     }
+  //   }, 4000);
+  // }, [lastTelegramUpdate]);
 
-  const handleProceedToPayment = () => {
-    setFormError('');
-    if (!customerName.trim() || !phoneNumber.trim() || !address.trim()) {
-      setFormError('Required Fields Missing: Please enter your Name, Phone Number, and Address.');
-      return;
-    }
+  // const handleProceedToPayment = () => {
+  //   setFormError('');
+  //   if (!customerName.trim() || !phoneNumber.trim() || !address.trim()) {
+  //     setFormError('Required Fields Missing: Please enter your Name, Phone Number, and Address.');
+  //     return;
+  //   }
 
-    const date = new Date().toLocaleDateString('en-US', {
-      year: 'numeric', month: 'long', day: 'numeric',
-      hour: '2-digit', minute: '2-digit',
+  //   const date = new Date().toLocaleDateString('en-US', {
+  //     year: 'numeric', month: 'long', day: 'numeric',
+  //     hour: '2-digit', minute: '2-digit',
+  //   });
+  //   const uniqueId = Math.floor(100000 + Math.random() * 900000);
+
+  //   const invoice = {
+  //     id:           uniqueId,
+  //     accountEmail: userEmail,
+  //     customerName, items: [...cart],
+  //     subtotal,     shippingFee,  total: grandTotal,
+  //     phone:        phoneNumber,  address, mapLocation,
+  //     carrier:      deliveryMethod, date,
+  //     status:       'pending',
+  //   };
+
+  //   setPendingInvoice(invoice);
+  //   setProofFile(null);
+  //   setProofPreview(null);
+  //   setProofError('');
+  //   setPayStatus(PAY_STATUS.PENDING);
+  //   setShowQrModal(true);
+  //   startTimer();
+  // };
+
+  // const handleUserConfirm = () => {
+  //   if (payStatus !== PAY_STATUS.PENDING) return;
+  //   setPayStatus(PAY_STATUS.UPLOADING);
+  //   setProofError('');
+  // };
+
+  // const handleFileSelect = (e) => {
+  //   const file = e.target.files?.[0];
+  //   if (!file) return;
+  //   processFile(file);
+  // };
+
+  // const handleDrop = (e) => {
+  //   e.preventDefault();
+  //   const file = e.dataTransfer.files?.[0];
+  //   if (!file) return;
+  //   processFile(file);
+  // };
+
+  // const processFile = (file) => {
+  //   setProofError('');
+  //   const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf'];
+  //   if (!allowed.includes(file.type)) {
+  //     setProofError('Only images (JPG, PNG, WebP) or PDF files are accepted.');
+  //     return;
+  //   }
+  //   if (file.size > 10 * 1024 * 1024) {
+  //     setProofError('File too large. Maximum size is 10 MB.');
+  //     return;
+  //   }
+
+  //   setProofFile(file);
+
+  //   if (file.type !== 'application/pdf') {
+  //     const url = URL.createObjectURL(file);
+  //     setProofPreview(url);
+  //   } else {
+  //     setProofPreview(null);
+  //   }
+  // };
+
+  // const handleRemoveProof = () => {
+  //   if (proofPreview) URL.revokeObjectURL(proofPreview);
+  //   setProofFile(null);
+  //   setProofPreview(null);
+  //   setProofError('');
+  //   if (fileInputRef.current) fileInputRef.current.value = '';
+  // };
+
+  // const handleSubmitProof = async () => {
+  //   if (!proofFile) {
+  //     setProofError('Please attach your payment screenshot or PDF before submitting.');
+  //     return;
+  //   }
+
+  //   setPayStatus(PAY_STATUS.SUBMITTING);
+  //   setUploadProgress('Sending order details…');
+
+  //   try {
+  //     await sendOrderAlert(pendingInvoice);
+
+  //     setUploadProgress('Uploading payment proof…');
+
+  //     const proofResult = await sendPaymentProof(
+  //       proofFile,
+  //       pendingInvoice.id,
+  //       pendingInvoice.customerName,
+  //       pendingInvoice.total.toFixed(2)
+  //     );
+
+  //     if (!proofResult?.ok) {
+  //       throw new Error('File upload failed');
+  //     }
+
+  //     setUploadProgress('Waiting for admin confirmation…');
+
+  //     setPayStatus(PAY_STATUS.VERIFYING);
+  //     startPolling(pendingInvoice.id);
+
+  //   } catch (err) {
+  //     console.error(err);
+  //     setProofError('Upload failed. Please check your connection and try again.');
+  //     setPayStatus(PAY_STATUS.UPLOADING);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   if (payStatus !== PAY_STATUS.CONFIRMED || !pendingInvoice) return;
+
+  //   const finalize = async () => {
+  //     const finalInvoice = saveOrder(pendingInvoice, orderHistory);
+  //     setInvoiceDetails(finalInvoice);
+
+  //     await sendPaymentConfirmedAlert(finalInvoice);
+
+  //     checkout();
+  //     setCustomerName(''); setPhoneNumber(''); setAddress(''); setMapLocation('');
+  //     setPendingInvoice(null);
+  //     setProofFile(null);
+  //     setProofPreview(null);
+  //     setShowQrModal(false);
+  //     setShowInvoiceModal(true);
+  //   };
+
+  //   finalize();
+  // // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [payStatus]);
+
+
+  // Add this constant at the top (same as other files)
+const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+// Replace your current saveOrder function with this:
+const saveOrderToDB = async (invoice) => {
+  try {
+    const res = await fetch(`${API}/api/orders`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId: invoice.accountEmail,           // or use real userId if available
+        userEmail: invoice.accountEmail,
+        userName: invoice.customerName,
+        items: invoice.items,
+        total: invoice.total,
+        shippingFee: invoice.shippingFee,
+        carrier: invoice.carrier,
+        address: invoice.address,
+        phone: invoice.phone,
+      }),
     });
-    const uniqueId = Math.floor(100000 + Math.random() * 900000);
 
-    const invoice = {
-      id:           uniqueId,
-      accountEmail: userEmail,
-      customerName, items: [...cart],
-      subtotal,     shippingFee,  total: grandTotal,
-      phone:        phoneNumber,  address, mapLocation,
-      carrier:      deliveryMethod, date,
-      status:       'pending',
-    };
+    if (!res.ok) throw new Error('Failed to save order');
+    
+    console.log('✅ Order saved to database');
+    return true;
+  } catch (err) {
+    console.error('Failed to save to DB:', err);
+    return false;
+  }
+};
 
-    setPendingInvoice(invoice);
+// Update the finalize function inside useEffect
+useEffect(() => {
+  if (payStatus !== PAY_STATUS.CONFIRMED || !pendingInvoice) return;
+
+  const finalize = async () => {
+    const finalInvoice = saveOrder(pendingInvoice, orderHistory); // keep local for now
+
+    // NEW: Save to Database
+    await saveOrderToDB(finalInvoice);
+
+    await sendPaymentConfirmedAlert(finalInvoice);
+
+    checkout();
+    setCustomerName(''); 
+    setPhoneNumber(''); 
+    setAddress(''); 
+    setMapLocation('');
+    setPendingInvoice(null);
     setProofFile(null);
     setProofPreview(null);
-    setProofError('');
-    setPayStatus(PAY_STATUS.PENDING);
-    setShowQrModal(true);
-    startTimer();
+    setShowQrModal(false);
+    setShowInvoiceModal(true);
   };
 
-  const handleUserConfirm = () => {
-    if (payStatus !== PAY_STATUS.PENDING) return;
-    setPayStatus(PAY_STATUS.UPLOADING);
-    setProofError('');
-  };
+  finalize();
+}, [payStatus]);
 
-  const handleFileSelect = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    processFile(file);
-  };
 
-  const handleDrop = (e) => {
-    e.preventDefault();
-    const file = e.dataTransfer.files?.[0];
-    if (!file) return;
-    processFile(file);
-  };
 
-  const processFile = (file) => {
-    setProofError('');
-    const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf'];
-    if (!allowed.includes(file.type)) {
-      setProofError('Only images (JPG, PNG, WebP) or PDF files are accepted.');
-      return;
-    }
-    if (file.size > 10 * 1024 * 1024) {
-      setProofError('File too large. Maximum size is 10 MB.');
-      return;
-    }
-
-    setProofFile(file);
-
-    if (file.type !== 'application/pdf') {
-      const url = URL.createObjectURL(file);
-      setProofPreview(url);
-    } else {
-      setProofPreview(null);
-    }
-  };
-
-  const handleRemoveProof = () => {
-    if (proofPreview) URL.revokeObjectURL(proofPreview);
-    setProofFile(null);
-    setProofPreview(null);
-    setProofError('');
-    if (fileInputRef.current) fileInputRef.current.value = '';
-  };
-
-  const handleSubmitProof = async () => {
-    if (!proofFile) {
-      setProofError('Please attach your payment screenshot or PDF before submitting.');
-      return;
-    }
-
-    setPayStatus(PAY_STATUS.SUBMITTING);
-    setUploadProgress('Sending order details…');
-
-    try {
-      await sendOrderAlert(pendingInvoice);
-
-      setUploadProgress('Uploading payment proof…');
-
-      const proofResult = await sendPaymentProof(
-        proofFile,
-        pendingInvoice.id,
-        pendingInvoice.customerName,
-        pendingInvoice.total.toFixed(2)
-      );
-
-      if (!proofResult?.ok) {
-        throw new Error('File upload failed');
-      }
-
-      setUploadProgress('Waiting for admin confirmation…');
-
-      setPayStatus(PAY_STATUS.VERIFYING);
-      startPolling(pendingInvoice.id);
-
-    } catch (err) {
-      console.error(err);
-      setProofError('Upload failed. Please check your connection and try again.');
-      setPayStatus(PAY_STATUS.UPLOADING);
-    }
-  };
-
-  useEffect(() => {
-    if (payStatus !== PAY_STATUS.CONFIRMED || !pendingInvoice) return;
-
-    const finalize = async () => {
-      const finalInvoice = saveOrder(pendingInvoice, orderHistory);
-      setInvoiceDetails(finalInvoice);
-
-      await sendPaymentConfirmedAlert(finalInvoice);
-
-      checkout();
-      setCustomerName(''); setPhoneNumber(''); setAddress(''); setMapLocation('');
-      setPendingInvoice(null);
-      setProofFile(null);
-      setProofPreview(null);
-      setShowQrModal(false);
-      setShowInvoiceModal(true);
-    };
-
-    finalize();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [payStatus]);
 
   const handleRetry = () => {
     clearInterval(timerRef.current);
