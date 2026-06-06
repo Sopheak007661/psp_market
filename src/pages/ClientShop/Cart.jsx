@@ -5439,25 +5439,32 @@ export default function Cart({ userEmail, userRole }) {
   const secondsRef = useRef(QR_EXPIRY_SECONDS);
 
   // ── Load order history from REAL DATABASE ─────────────────────────────────
-  const loadHistory = useCallback(async () => {
-    setHistoryLoading(true);
-    try {
-      // Admin gets all orders; regular user gets only their own
-      const url = userRole === 'admin'
-        ? `${API}/api/orders`
-        : `${API}/api/orders?email=${encodeURIComponent(userEmail)}`;
+const loadHistory = useCallback(async () => {
+  setHistoryLoading(true);
+  try {
+    const url = userRole === 'admin'
+      ? `${API}/api/orders`
+      : `${API}/api/orders?email=${encodeURIComponent(userEmail)}`;
 
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    
+    // SAFE GUARD: Always verify that 'data' is actually an Array before passing it to state
+    if (Array.isArray(data)) {
       setOrderHistory(data);
-    } catch (err) {
-      console.error('Failed to load order history from database:', err);
-      // If DB is down, keep whatever is already in state (don't wipe it)
-    } finally {
-      setHistoryLoading(false);
+    } else if (data && typeof data === 'object' && data.order) {
+      // If server responds with wrapped metadata object, pull target array out
+      setOrderHistory([data.order]);
+    } else {
+      setOrderHistory([]);
     }
-  }, [userEmail, userRole]);
+  } catch (err) {
+    console.error('Failed to load order history from database:', err);
+  } finally {
+    setHistoryLoading(false);
+  }
+}, [userEmail, userRole]);
 
   // Load on mount and poll every 5 s for live updates
   useEffect(() => {
@@ -5480,10 +5487,11 @@ export default function Cart({ userEmail, userRole }) {
   const filteredHistory = allowedHistory.filter(o => {
     const q = searchQuery.toLowerCase().trim();
     if (!q) return true;
+   // Added optional chaining here to ensure it safely falls back to empty string
     return (
-      String(o.id).includes(q) ||
-      o.customerName.toLowerCase().includes(q) ||
-      o.phone.includes(q)
+      (o.id ? String(o.id) : '').includes(q) ||
+      (o.customerName ? o.customerName.toLowerCase() : '').includes(q) ||
+      (o.phone ? String(o.phone) : '').includes(q)
     );
   });
 
@@ -5557,7 +5565,7 @@ export default function Cart({ userEmail, userRole }) {
       return;
     }
     const date     = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-    const uniqueId = Math.floor(100000 + Math.random() * 900000);
+    const uniqueId = String(Math.floor(100000 + Math.random() * 900000));
     const invoice  = {
       id:           uniqueId,
       accountEmail: userEmail,
@@ -5711,7 +5719,12 @@ export default function Cart({ userEmail, userRole }) {
     setOrderHistory(prev => prev.filter(o => String(o.id) !== String(orderId)));
 
     try {
-      const res = await fetch(`${API}/api/orders/${orderId}`, { method: 'DELETE' });
+      const res = await fetch(`${API}/api/orders/${orderId}`, { 
+  method: 'DELETE',
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
         alert(`Failed to delete from database: ${errData.message || 'Unknown error'}`);
