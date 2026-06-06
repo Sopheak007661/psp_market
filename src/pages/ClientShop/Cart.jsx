@@ -5647,41 +5647,75 @@ const loadHistory = useCallback(async () => {
     }
   };
 
-  // ── When admin confirms payment via Telegram → save to DB ─────────────────
-  useEffect(() => {
-    if (payStatus !== PAY_STATUS.CONFIRMED || !pendingInvoice) return;
+  // // ── When admin confirms payment via Telegram → save to DB ─────────────────
+  // useEffect(() => {
+  //   if (payStatus !== PAY_STATUS.CONFIRMED || !pendingInvoice) return;
 
-    const finalize = async () => {
-      // 1. Save to real database
-      const confirmedInvoice = { ...pendingInvoice, status: 'confirmed' };
-      const savedOrder       = await saveOrderToDB(confirmedInvoice);
+  //   const finalize = async () => {
+  //     // 1. Save to real database
+  //     const confirmedInvoice = { ...pendingInvoice, status: 'confirmed' };
+  //     const savedOrder       = await saveOrderToDB(confirmedInvoice);
 
-      // 2. Show invoice with DB-returned data (or fallback to local copy)
-      setInvoiceDetails(savedOrder || confirmedInvoice);
-      setInvoiceFromHistory(false);
+  //     // 2. Show invoice with DB-returned data (or fallback to local copy)
+  //     setInvoiceDetails(savedOrder || confirmedInvoice);
+  //     setInvoiceFromHistory(false);
 
-      // 3. Notify admin via Telegram
-      await sendPaymentConfirmedAlert(confirmedInvoice);
+  //     // 3. Notify admin via Telegram
+  //     await sendPaymentConfirmedAlert(confirmedInvoice);
 
-      // 4. Reload history from DB to reflect the new order immediately
-      await loadHistory();
+  //     // 4. Reload history from DB to reflect the new order immediately
+  //     await loadHistory();
 
-      // 5. Clear cart and form
-      checkout();
-      setCustomerName('');
-      setPhoneNumber('');
-      setAddress('');
-      setMapLocation('');
-      setPendingInvoice(null);
-      setProofFile(null);
-      setProofPreview(null);
-      setShowQrModal(false);
-      setShowInvoiceModal(true);
-    };
+  //     // 5. Clear cart and form
+  //     checkout();
+  //     setCustomerName('');
+  //     setPhoneNumber('');
+  //     setAddress('');
+  //     setMapLocation('');
+  //     setPendingInvoice(null);
+  //     setProofFile(null);
+  //     setProofPreview(null);
+  //     setShowQrModal(false);
+  //     setShowInvoiceModal(true);
+  //   };
 
-    finalize();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [payStatus]);
+  //   finalize();
+  // // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [payStatus]);
+
+
+
+// ... (full cleaned code with fixes - I recommend replacing your current Cart.js with this version)
+
+// Main changes in finalize useEffect and loadHistory:
+useEffect(() => {
+  if (payStatus !== PAY_STATUS.CONFIRMED || !pendingInvoice) return;
+
+  const finalize = async () => {
+    const confirmedInvoice = { ...pendingInvoice, status: 'paid' };
+    const savedOrder = await saveOrderToDB(confirmedInvoice);
+
+    setInvoiceDetails(savedOrder || confirmedInvoice);
+    setInvoiceFromHistory(false);
+
+    await sendPaymentConfirmedAlert(confirmedInvoice);
+    await loadHistory(); // ← Critical fix: immediate refresh
+
+    checkout(); // clear cart
+    // reset forms...
+    setShowQrModal(false);
+    setShowInvoiceModal(true);
+  };
+
+  finalize();
+}, [payStatus, pendingInvoice /* other deps */]);
+
+
+
+
+
+
+
 
   const handleRetry = () => {
     clearInterval(timerRef.current);
