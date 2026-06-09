@@ -7808,13 +7808,6 @@
 
 
 
-
-
-
-
-
-
-
 import React, { useState, useContext, useEffect, useRef, useCallback } from 'react';
 import { ShopContext } from '../../context/ShopContext';
 import {
@@ -8134,15 +8127,19 @@ export default function Cart({ userEmail, userRole }) {
     try {
       const url = userRole === 'admin'
         ? `${API}/api/orders`
-        : `${API}/api/orders?email=${encodeURIComponent(userEmail)}`;
+        : `${API}/api/orders?email=${encodeURIComponent((userEmail || '').toLowerCase().trim())}`;
 
       const res = await fetch(url);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
 
+      console.log('[loadHistory] raw response:', data);
+
       // ✅ FIX: Apply hydrateOrderFE to every order so fields are normalized
       if (Array.isArray(data)) {
-        setOrderHistory(data.map(hydrateOrderFE));
+        const hydrated = data.map(hydrateOrderFE);
+        console.log('[loadHistory] hydrated orders:', hydrated.length, hydrated.map(o => ({ id: o.id, email: o.accountEmail })));
+        setOrderHistory(hydrated);
       } else if (data && typeof data === 'object' && data.order) {
         setOrderHistory([hydrateOrderFE(data.order)]);
       } else {
@@ -8214,9 +8211,10 @@ export default function Cart({ userEmail, userRole }) {
     }
   }, []);
 
-  const allowedHistory = userRole === 'admin'
-    ? orderHistory
-    : orderHistory.filter(o => o.accountEmail === userEmail);
+  // ✅ FIX: Server already filters by email via ?email= query param.
+  // Frontend re-filtering caused 0 records when email casing/whitespace differed.
+  // We now trust the server response — just use orderHistory directly.
+  const allowedHistory = orderHistory;
 
   const filteredHistory = allowedHistory.filter(o => {
     const q = searchQuery.toLowerCase().trim();
