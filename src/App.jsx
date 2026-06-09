@@ -3250,12 +3250,20 @@ function AuthModal({ onClose, onLogin, defaultTab = 'signin' }) {
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)' }}
-      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
-    >
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-modalPop">
+  <div
+    className="fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-300"
+    style={{ 
+      // Blends a dark translucent overlay with your custom background image
+      backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.75)), url('https://img.sanishtech.com/u/1633594ef766e0b33213011add414d67.png')`,
+      backgroundPosition: 'center',
+      backgroundSize: 'cover',
+      backgroundRepeat: 'no-repeat',
+      backdropFilter: 'blur(6px)',
+      WebkitBackdropFilter: 'blur(6px)' // Safeguard for Safari support
+    }}
+    onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+  >
+      <div className="bg-blue-100 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-modalPop shadow-xl shadow-blue-800">
         <div className="relative px-6 pt-6 pb-0 text-center">
           <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 transition">
             <X size={15} />
@@ -3272,18 +3280,18 @@ function AuthModal({ onClose, onLogin, defaultTab = 'signin' }) {
           </p>
         </div>
 
-        <div className="px-6 mb-4">
-          <div className="bg-slate-100 p-1 rounded-xl flex gap-0.5">
+        <div className="px-6 mb-4 bg-blue-200">
+          <div className="bg-blue-100 px-3 py-2 rounded-xl flex gap-0.5 shadow-xl shadow-blue-400">
             {[
               { key: 'signin',   label: 'Sign in',  icon: <User size={12} /> },
               { key: 'register', label: 'Register', icon: <UserPlus size={12} /> },
               { key: 'admin',    label: 'Admin',    icon: <Shield size={12} /> },
             ].map(t => (
               <button key={t.key} type="button" onClick={() => switchTab(t.key)}
-                className={`flex-1 py-2 rounded-lg text-xs font-semibold transition flex items-center justify-center gap-1.5 ${
+                className={`flex-1 py-2 rounded-lg text-xs font-semibold transition flex items-center justify-center  gap-1.5 ${
                   activeTab === t.key
                     ? (t.key === 'admin' ? 'bg-red-600 text-white shadow-sm' : 'bg-blue-600 text-white shadow-sm')
-                    : 'text-slate-500 hover:text-slate-700'
+                    : 'text-slate-500 hover:text-slate-700 bg-white'
                 }`}>
                 {t.icon} {t.label}
               </button>
@@ -3291,12 +3299,12 @@ function AuthModal({ onClose, onLogin, defaultTab = 'signin' }) {
           </div>
         </div>
 
-        <div className="px-6 pb-6">
+        <div className="px-6 pb-6 bg-blue-100">
           {activeTab !== 'admin' && (
             <>
               <div className="grid grid-cols-2 gap-2 mb-3">
-                <button type="button" className="flex items-center justify-center gap-2 border border-slate-200 rounded-xl py-2.5 text-xs font-medium text-slate-700 hover:bg-slate-50 transition"><GoogleIcon /> Google</button>
-                <button type="button" className="flex items-center justify-center gap-2 border border-slate-200 rounded-xl py-2.5 text-xs font-medium text-slate-700 hover:bg-slate-50 transition"><FacebookIcon /> Facebook</button>
+                <button type="button" className="flex items-center bg-white justify-center gap-2 border border-slate-200 rounded-xl py-2.5 text-xs font-medium text-slate-700 hover:bg-slate-50 transition"><GoogleIcon /> Google</button>
+                <button type="button" className="flex items-center bg-white justify-center gap-2 border border-slate-200 rounded-xl py-2.5 text-xs font-medium text-slate-700 hover:bg-slate-50 transition"><FacebookIcon /> Facebook</button>
               </div>
               <div className="flex items-center gap-3 mb-3">
                 <div className="flex-1 h-px bg-slate-200" /><span className="text-[10px] text-slate-400 font-medium">or continue with email</span><div className="flex-1 h-px bg-slate-200" />
@@ -3317,7 +3325,7 @@ function AuthModal({ onClose, onLogin, defaultTab = 'signin' }) {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-3">
+          <form onSubmit={handleSubmit} className="space-y-3 bg-blue-200 p-5 shadow-xl  shadow-white rounded-xl ">
             {activeTab === 'register' && (
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Full name</label>
